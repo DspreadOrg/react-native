@@ -61,19 +61,19 @@ public class WelcomeActivity extends BaseActivity implements OnClickListener, De
 	@Override
 	protected int getLayoutId() {
 		mReactRootView = new ReactRootView(this);
-		List<ReactPackage> packages = new PackageList(getApplication()).getPackages();
-		mReactInstanceManager = ReactInstanceManager.builder()
-				.setApplication(getApplication())
-				.setCurrentActivity(this)
-				.setBundleAssetName("index.android.bundle")
-				.setJSMainModulePath("index")
-				.addPackages(packages)
-				.setUseDeveloperSupport(BuildConfig.DEBUG)
-				.setInitialLifecycleState(LifecycleState.RESUMED)
-				.build();
-		// 注意这里的MyReactNativeApp必须对应“index.js”中的
-		// “AppRegistry.registerComponent()”的第一个参数
-		mReactRootView.startReactApplication(mReactInstanceManager, "MyReactNativeApp", null);
+//		List<ReactPackage> packages = new PackageList(getApplication()).getPackages();
+//		mReactInstanceManager = ReactInstanceManager.builder()
+//				.setApplication(getApplication())
+//				.setCurrentActivity(this)
+//				.setBundleAssetName("index.android.bundle")
+//				.setJSMainModulePath("index")
+//				.addPackages(packages)
+//				.setUseDeveloperSupport(BuildConfig.DEBUG)
+//				.setInitialLifecycleState(LifecycleState.RESUMED)
+//				.build();
+//		// 注意这里的MyReactNativeApp必须对应“index.js”中的
+//		// “AppRegistry.registerComponent()”的第一个参数
+//		mReactRootView.startReactApplication(mReactInstanceManager, "MyReactNativeApp", null);
 		return R.layout.activity_welcome;
 	}
 
