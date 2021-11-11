@@ -1,0 +1,12 @@
+before_script:
+  - npm install
+
+buildapk:
+  stage: test
+  script:
+    - cd android
+    - ./gradlew assembleRelease
+  artifacts:
+    paths:
+      - /pos_android_studio_app/build/outputs/apk/release/pos_android_studio_app-release.apk
+

@@ -8,6 +8,12 @@ android {
             keyPassword 'dspread'
             keyAlias 'gundam_wing'
         }
+        release {
+            storeFile file('app.keystore')
+            storePassword 'dspread'
+            keyPassword 'dspread'
+            keyAlias 'gundam_wing'
+        }
         config {
             keyAlias 'key0'
             keyPassword '123789'
@@ -15,15 +21,15 @@ android {
             storePassword '123789'
         }
     }
-    compileSdkVersion 28
-    buildToolsVersion "28.0.3"
+    compileSdkVersion 30
+    buildToolsVersion "30.0.3"
     defaultConfig {
         applicationId "com.dspread.demoui"
         minSdkVersion 17
-        targetSdkVersion 28
+        targetSdkVersion 30
 
-        versionCode 2
-        versionName "3.0.1"
+        versionCode 3
+        versionName "3.0.2"
         multiDexEnabled true
         ndk {
             moduleName "serial_port"
@@ -38,6 +44,7 @@ android {
     buildTypes {
         release {
             minifyEnabled true
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 
         }
