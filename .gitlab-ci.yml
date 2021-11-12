@@ -1,4 +1,5 @@
-image: node:latest
+# image: node:latest
+image: registry.gitlab.com/motorica-org/gitlab-ci-react-native-android:master
 
 before_script:
   - npm install
@@ -15,7 +16,7 @@ buildapk:
     - cd android
     - chmod +x gradlew
     - export GRADLE_USER_HOME=$(pwd)/.gradle
-    - export JAVA_HOME="/usr/bin/java"
+    # - export JAVA_HOME="/usr/bin/java"
     - ./gradlew assembleRelease
   artifacts:
     paths:
