@@ -1,18 +1,20 @@
 # image: node:latest
 image: registry.gitlab.com/motorica-org/gitlab-ci-react-native-android:master
 
-before_script:
-  - npm install
+# before_script:
+#   - npm install
 
 cache:
   untracked: true
   key: "$CI_PROJECT_ID"
   paths:
     - node_modules/
+    - .gradle/
 
 buildapk:
-  stage: test
+  stage: build
   script:
+    - yarn install
     - cd android
     - chmod +x gradlew
     - export GRADLE_USER_HOME=$(pwd)/.gradle
