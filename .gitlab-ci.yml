@@ -14,6 +14,9 @@ cache:
 buildapk:
   stage: build
   script:
+    - sudo npm cache clean -f
+    - sudo npm install -g n
+    - sudo n stable
     - yarn install
     - cd android
     - chmod +x gradlew
