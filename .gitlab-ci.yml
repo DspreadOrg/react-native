@@ -21,6 +21,7 @@ buildapk:
     # - sudo npm cache clean -f
     # - sudo npm install -g n
     # - sudo n stable
+    - yarn config set ignore-engines true
     - yarn install
     - cd android
     # - echo $ANDROID_SDK_HOME
