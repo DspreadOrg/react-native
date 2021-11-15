@@ -1,8 +1,10 @@
 # image: node:latest
-image: registry.gitlab.com/motorica-org/gitlab-ci-react-native-android:master
+# image: registry.gitlab.com/motorica-org/gitlab-ci-react-native-android:master
+image: reactnativecommunity/react-native-android:latest
 
-# before_script:
+before_script:
 #   - npm install
+   - yarn
 
 cache:
   untracked: true
@@ -14,13 +16,13 @@ cache:
 buildapk:
   stage: build
   script:
-    - sudo npm cache clean -f
-    - sudo npm install -g n
-    - sudo n stable
-    - yarn install
+    # - sudo npm cache clean -f
+    # - sudo npm install -g n
+    # - sudo n stable
+    # - yarn install
     - cd android
     - chmod +x gradlew
-    - export GRADLE_USER_HOME=$(pwd)/.gradle
+    # - export GRADLE_USER_HOME=$(pwd)/.gradle
     # - export JAVA_HOME="/usr/bin/java"
     - ./gradlew assembleRelease
   artifacts:
