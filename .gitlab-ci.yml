@@ -1,10 +1,12 @@
 # image: node:latest
-# image: registry.gitlab.com/motorica-org/gitlab-ci-react-native-android:master
-image: reactnativecommunity/react-native-android:latest
+image: registry.gitlab.com/motorica-org/gitlab-ci-react-native-android:master
+# image: reactnativecommunity/react-native-android:latest
 
 before_script:
 #   - npm install
-   - yarn
+   - export GRADLE_USER_HOME=$(pwd)/.gradle
+   - chmod +x ./android/gradlew
+   # - yarn
 
 cache:
   untracked: true
@@ -19,11 +21,10 @@ buildapk:
     # - sudo npm cache clean -f
     # - sudo npm install -g n
     # - sudo n stable
-    # - yarn install
+    - yarn install
     - cd android
-    - chmod +x gradlew
-    - echo $ANDROID_SDK_HOME
-    - echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;20.0.5594570" --sdk_root=${ANDROID_SDK_ROOT}
+    # - echo $ANDROID_SDK_HOME
+    # - echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;20.0.5594570" --sdk_root=${ANDROID_SDK_ROOT}
     # - echo $ANDROID_NDK_HOME
     # - export PATH=$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$PATH
     # - export PATH=$ANDROID_HOME/build-tools/29.0.3:$PATH
