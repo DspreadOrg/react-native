@@ -22,6 +22,7 @@ buildapk:
     # - yarn install
     - cd android
     - chmod +x gradlew
+    - export PATH=$PATH:$ANDROID_NDK_HOME**
     # - export GRADLE_USER_HOME=$(pwd)/.gradle
     # - export JAVA_HOME="/usr/bin/java"
     - ./gradlew assembleRelease
