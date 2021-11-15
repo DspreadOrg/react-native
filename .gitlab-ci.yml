@@ -23,7 +23,7 @@ buildapk:
     - cd android
     - chmod +x gradlew
     - echo $ANDROID_SDK_HOME
-    - echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;20.0.5594570
+    - echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;20.0.5594570"
     # - echo $ANDROID_NDK_HOME
     # - export PATH=$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$PATH
     # - export PATH=$ANDROID_HOME/build-tools/29.0.3:$PATH
