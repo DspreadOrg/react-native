@@ -1,13 +1,14 @@
 # image: node:latest
 # image: registry.gitlab.com/motorica-org/gitlab-ci-react-native-android:master
 # image: reactnativecommunity/react-native-android:latest
-image: jangrewe/gitlab-ci-android
+# image: jangrewe/gitlab-ci-android
+image: webcuisine/gitlab-ci-react-native-android
 
 before_script:
-  - npm install
+  # - npm install
    # - export GRADLE_USER_HOME=$(pwd)/.gradle
    # - chmod +x ./android/gradlew
-   # - yarn
+   - yarn
 
 cache:
   untracked: true
@@ -31,7 +32,7 @@ buildapk:
     # - export PATH=$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$PATH
     # - export PATH=$ANDROID_HOME/build-tools/29.0.3:$PATH
     # - export PATH=$PATH:$ANDROID_NDK_HOME**
-    - export GRADLE_USER_HOME=$(pwd)/.gradle
+    # - export GRADLE_USER_HOME=$(pwd)/.gradle
     - chmod +x ./gradlew
     # - export JAVA_HOME="/usr/bin/java"
     - ./gradlew assembleRelease
