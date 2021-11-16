@@ -15,7 +15,7 @@ cache:
   key: "$CI_PROJECT_ID"
   paths:
     - node_modules/
-    - .gradle/
+    - android/.gradle/
 
 buildapk:
   stage: build
@@ -38,5 +38,5 @@ buildapk:
     - ./gradlew assembleRelease
   artifacts:
     paths:
-      - /pos_android_studio_app/build/outputs/apk/release/pos_android_studio_app-release.apk
+      - android/pos_android_studio_app/build/outputs/apk/release/pos_android_studio_app-release.apk
 
