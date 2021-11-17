@@ -18,3 +18,11 @@ The demo is the react native demo that integrate with pos.
 #### API Feature
 
  Please check link https://dspread.gitlab.io/qpos/#/
+
+#### How to run
+
+1.cd react-native
+
+2.run 'npm install' on terminal
+
+3.run 'yarn android', wait for the server and apk build
