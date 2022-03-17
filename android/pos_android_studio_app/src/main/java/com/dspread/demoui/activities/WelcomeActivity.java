@@ -51,7 +51,6 @@ public class WelcomeActivity extends BaseActivity implements OnClickListener, De
 		serial_port.setOnClickListener(this);
 		normal_blu.setOnClickListener(this);
 		other_blu.setOnClickListener(this);
-		bluetoothRelaPer();
 	}
 
 	@Override
@@ -93,12 +92,13 @@ public class WelcomeActivity extends BaseActivity implements OnClickListener, De
 				startActivity(intent);
 				break;
 			case R.id.normal_bluetooth://普通蓝牙连接
+				bluetoothRelaPer();
 				intent = new Intent(this, BluetoothActivity.class);
-
 				intent.putExtra("connect_type", 3);
 				startActivity(intent);
 				break;
 			case R.id.other_bluetooth://其他蓝牙连接，例如：BLE，，，
+				bluetoothRelaPer();
 				intent = new Intent(this, BluetoothActivity.class);
 				intent.putExtra("connect_type", 4);
 				startActivity(intent);

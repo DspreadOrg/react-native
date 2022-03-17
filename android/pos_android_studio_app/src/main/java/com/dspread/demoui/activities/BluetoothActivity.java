@@ -608,7 +608,7 @@ public class BluetoothActivity extends BaseActivity implements ShowGuideView.onG
             //key：0123456789ABCDEFFEDCBA9876543210
             //result：0123456789ABCDEFFEDCBA9876543210
             int keyIndex = getKeyIndex();
-            pos.udpateWorkKey(
+            pos.updateWorkKey(
                     "1A4D672DCA6CB3351FD1B02B237AF9AE", "08D7B4FB629D0885",//PIN KEY
                     "1A4D672DCA6CB3351FD1B02B237AF9AE", "08D7B4FB629D0885",  //TRACK KEY
                     "1A4D672DCA6CB3351FD1B02B237AF9AE", "08D7B4FB629D0885", //MAC KEY
@@ -1926,15 +1926,6 @@ public class BluetoothActivity extends BaseActivity implements ShowGuideView.onG
         }
 
         @Override
-        public void onEncryptData(String arg0) {
-            if (arg0 != null) {
-                TRACE.d("onEncryptData(String arg0) :" + arg0);
-                statusEditText.setText("get the encrypted result is :" + arg0);
-                TRACE.d("get the encrypted result is :" + arg0);
-            }
-        }
-
-        @Override
         public void onQposKsnResult(Hashtable<String, String> arg0) {
             TRACE.d("onQposKsnResult(Hashtable<String, String> arg0):" + arg0.toString());
             String pinKsn = arg0.get("pinKsn");
@@ -1991,16 +1982,6 @@ public class BluetoothActivity extends BaseActivity implements ShowGuideView.onG
                 sum += bit * Math.pow(16, (3 - i));
             }
             pubModel = clearKeys.substring(4, 4 + sum * 2);
-        }
-
-        @Override
-        public void onSetPosBlePinCode(boolean b) {
-            TRACE.d("onSetPosBlePinCode(b):" + b);
-            if (b) {
-                statusEditText.setText("onSetPosBlePinCode success");
-            } else {
-                statusEditText.setText("onSetPosBlePinCode fail");
-            }
         }
 
         @Override
@@ -2445,7 +2426,7 @@ public class BluetoothActivity extends BaseActivity implements ShowGuideView.onG
                 pos.setKeyValue(startAddr);
                 pos.setBlockaddr(endAddr);
 //                pos.doMifareCard("08", 20);
-                pos.faseReadMifareCardData(startAddr,endAddr,20);
+                pos.fastReadMifareCardData(startAddr,endAddr,20);
             } else if (v == writeULBtn) {
                 String addr = blockAdd.getText().toString();
                 String data = status11.getText().toString();

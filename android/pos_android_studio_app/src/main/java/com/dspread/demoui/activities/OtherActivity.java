@@ -66,6 +66,7 @@ import Decoder.BASE64Encoder;
 public class OtherActivity extends BaseActivity{
 
     private Button doTradeButton, serialBtn;
+    private Button btn_poweron,btn_sendApdu,btn_poweroff;
 
     private EditText statusEditText;
     private ListView appListView;
@@ -173,6 +174,9 @@ public class OtherActivity extends BaseActivity{
         mKeyIndex = ((EditText) findViewById(R.id.keyindex));
         mhipStatus = (findViewById(R.id.chipStatus));
         lin = findViewById(R.id.lin);
+        btn_poweron = findViewById(R.id.btn_poweron);
+        btn_sendApdu = findViewById(R.id.btn_sendApdu);
+        btn_poweroff = findViewById(R.id.btn_poweroff);
     }
 
     private void initListener() {
@@ -181,6 +185,9 @@ public class OtherActivity extends BaseActivity{
         doTradeButton.setOnClickListener(myOnClickListener);//开始
         btnDisconnect.setOnClickListener(myOnClickListener);
         btnUSB.setOnClickListener(myOnClickListener);
+        btn_poweron.setOnClickListener(myOnClickListener);
+        btn_sendApdu.setOnClickListener(myOnClickListener);
+        btn_poweroff.setOnClickListener(myOnClickListener);
     }
     private POS_TYPE posType = POS_TYPE.BLUETOOTH;
 
@@ -210,7 +217,10 @@ public class OtherActivity extends BaseActivity{
         }
         if (mode == QPOSService.CommunicationMode.USB_OTG_CDC_ACM) {
             pos.setUsbSerialDriver(QPOSService.UsbOTGDriver.CH34XU);
+        }else if(mode == QPOSService.CommunicationMode.UART){
+            pos.setD20Trade(true);
         }
+
         pos.setConext(this);
         //通过handler处理，监听MyPosListener，实现QposService的接口，（回调接口）
         Handler handler = new Handler(Looper.myLooper());
@@ -372,7 +382,7 @@ public class OtherActivity extends BaseActivity{
 
 
             int keyIndex = getKeyIndex();
-            pos.udpateWorkKey(
+            pos.updateWorkKey(
                     "1A4D672DCA6CB3351FD1B02B237AF9AE", "08D7B4FB629D0885",//PIN KEY
                     "1A4D672DCA6CB3351FD1B02B237AF9AE", "08D7B4FB629D0885",  //TRACK KEY
                     "1A4D672DCA6CB3351FD1B02B237AF9AE", "08D7B4FB629D0885", //MAC KEY
@@ -1764,18 +1774,6 @@ public class OtherActivity extends BaseActivity{
         }
 
         @Override
-        public void onEncryptData(String arg0) {
-
-            if (arg0 != null) {
-                TRACE.d("onEncryptData(String arg0) :" + arg0);
-
-                statusEditText.setText("get the encrypted result is :" + arg0);
-                TRACE.d("get the encrypted result is :" + arg0);
-
-            }
-        }
-
-        @Override
         public void onQposKsnResult(Hashtable<String, String> arg0) {
             TRACE.d("onQposKsnResult(Hashtable<String, String> arg0):" + arg0.toString());
 
@@ -1848,18 +1846,6 @@ public class OtherActivity extends BaseActivity{
 
 
         }
-
-        @Override
-        public void onSetPosBlePinCode(boolean b) {
-            TRACE.d("onSetPosBlePinCode(b):" + b);
-
-            if (b) {
-                statusEditText.setText("onSetPosBlePinCode success");
-            } else {
-                statusEditText.setText("onSetPosBlePinCode fail");
-            }
-        }
-
 
         @Override
         public void onTradeCancelled() {
@@ -2258,6 +2244,13 @@ public class OtherActivity extends BaseActivity{
                 });
                 AlertDialog alert = builder.create();
                 alert.show();
+            }else if(v == btn_poweron){
+                statusEditText.setText("Please tap your card...");
+                pos.powerOnNFC(true,20);
+            }else if(v == btn_sendApdu){
+                pos.sendApdu("123456");
+            }else if(v == btn_poweroff){
+                pos.powerOffNFC(20);
             }
         }
     }

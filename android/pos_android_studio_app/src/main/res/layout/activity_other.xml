@@ -53,6 +53,33 @@
                     android:text="@string/scan_usb_device"/>
             </LinearLayout>
 
+            <LinearLayout
+                android:layout_marginTop="10dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal">
+                <Button
+                    android:id="@+id/btn_poweron"
+                    android:text="@string/power_on_nfc"
+                    android:layout_width="match_parent"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"/>
+                <Button
+                    android:id="@+id/btn_sendApdu"
+                    android:layout_weight="1"
+                    android:visibility="gone"
+                    android:text="@string/send_apdu"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+                <Button
+                    android:id="@+id/btn_poweroff"
+                    android:layout_weight="1"
+                    android:text="@string/power_off_nfc"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+            </LinearLayout>
+
 
             <LinearLayout
 
