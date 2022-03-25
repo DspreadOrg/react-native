@@ -1,4 +1,4 @@
-image: webcuisine/gitlab-ci-react-native-android
+image: adildev/react-native-android:latest
 
 before_script:
    - yarn
