@@ -1,3 +1,7 @@
+/**
+ * @format
+ */
+
 import React from "react";
 import{
   AppRegistry,
@@ -8,7 +12,8 @@ import{
   NativeModules,
   Alert
 } from "react-native";
-// import Constants from "expo-constants";
+// import catComponent from './catComponent';
+var pos = NativeModules.NativePosModule;
 var test = NativeModules.JumpModule;
 class WelcomeGuide extends React.Component{
 	render(){
@@ -16,7 +21,7 @@ class WelcomeGuide extends React.Component{
 				<View style={styles.container}>
 					<Button title="Start Now!" onPress={this.scanBluetooth}/>
 				</View>
-			);
+			)
 	}
 
 	scanBluetooth(){
@@ -43,6 +48,7 @@ const styles = StyleSheet.create({
 });
 
 AppRegistry.registerComponent(
-	'DspreadReactPosApp',
+	"ReactNativeDemo",
 	() => WelcomeGuide
 );
+
