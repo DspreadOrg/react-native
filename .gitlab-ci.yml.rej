@@ -1,0 +1,8 @@
+diff a/.gitlab-ci.yml b/.gitlab-ci.yml	(rejected hunks)
+@@ -18,5 +18,6 @@
+     - ./gradlew assembleRelease
+   artifacts:
+     paths:
++      -android/app/build/outputs/apk/debug/app-debug.apk
+       
+ 
