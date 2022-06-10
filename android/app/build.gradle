@@ -283,9 +283,7 @@ dependencies {
 //    implementation files('libs\\dspread_pos_sdk_3.9.9.jar')
 //    implementation files('libs\\sun.misc.BASE64Decoder.jar')
 //    implementation 'com.binioter:guideview:1.1.0'
-//    implementation 'com.binioter:guideview:1.0.0'
-    implementation project(':guideview')
-
+    implementation files('libs\\guideview.jar')
 
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
