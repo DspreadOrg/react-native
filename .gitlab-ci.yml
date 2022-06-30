@@ -13,9 +13,13 @@ cache:
 stages:
   - build
  
-job 1:
-  stage: build
-  script: make build dependencies
+job:
+  # use regexp
+  only:
+    - /^issue-.*$/
+  # use special keyword
+  except:
+    - branches
 
-        
+
 
