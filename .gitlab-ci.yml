@@ -11,13 +11,13 @@ cache:
     - android/.gradle/
 
   buildapk:
-
   stage: build
-  
+
   script:
     - cd android
     - chmod +x ./gradlew
     - ./gradlew assembleRelease
+    
   artifacts:
         paths:
              - android/pos_android_studio_app/build/outputs/apk/release/pos_android_studio_app-release.apk
