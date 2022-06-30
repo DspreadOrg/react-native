@@ -1,6 +1,9 @@
-image: adildev/react-native-android:latest
+image: webcuisine/gitlab-ci-react-native-android
 
 before_script:
+  # - npm install
+   # - export GRADLE_USER_HOME=$(pwd)/.gradle
+   # - chmod +x ./android/gradlew
    - yarn
 
 cache:
@@ -8,16 +11,11 @@ cache:
   key: "$CI_PROJECT_ID"
   paths:
     - node_modules/
-    - android/.gradle/
+    - .gradle/
 
-  buildapk:
+buildapk:
   stage: build
-  script:
-    - cd android
-    - chmod +x ./gradlew
-    - ./gradlew assembleRelease    
+    - ./gradlew assembleRelease
   artifacts:
-        paths:
-             - android/pos_android_studio_app/build/outputs/apk/release/pos_android_studio_app-release.apk
-        
-
+    paths:
+       - /pos_android_studio_app/build/outputs/apk/release/pos_android_studio_app-release.apk
