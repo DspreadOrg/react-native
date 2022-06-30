@@ -12,6 +12,7 @@ cache:
 
 buildapk:
   stage: build
+        - test
   script:
     - cd android
     - chmod +x ./gradlew
@@ -19,4 +20,5 @@ buildapk:
   artifacts:
     paths:
       - android/app/build/outputs/apk/debug/app-debug.apk
+        
 
