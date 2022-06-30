@@ -11,6 +11,7 @@ cache:
     - android/.gradle/
 
   stage: build
+  buildapk:
   script:
     - cd android
     - chmod +x ./gradlew
