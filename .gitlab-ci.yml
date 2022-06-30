@@ -9,9 +9,13 @@ cache:
   paths:
     - node_modules/
     - android/.gradle/
-
-  stage: build
+  stages:
+  - build
+  - test
+  - deploy
+ 
   buildapk:
+     stage: build
   script:
     - cd android
     - chmod +x ./gradlew
