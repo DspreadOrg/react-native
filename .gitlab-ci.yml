@@ -11,8 +11,10 @@ cache:
     - android/.gradle/
 
 buildapk:
-  stage: 
-    - build
+  stage:
+     build
+   - test
+   - release
        
   script:
     - cd android
@@ -20,6 +22,6 @@ buildapk:
     - ./gradlew assembleRelease
   artifacts:
     paths:
-      - android/app/build/outputs/apk/debug/app-debug.apk
+      - android/app/build/outputs/apk/release/app-debug.apk
         
 
