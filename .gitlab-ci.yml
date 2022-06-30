@@ -10,20 +10,6 @@ cache:
     - node_modules/
     - android/.gradle/
 
-buildapk:
-  stage:
-     build
-   - build
-    - test 
-    - deploy 
-    - post
-          
-  script:
-    - cd android
-    - chmod +x ./gradlew
-    - ./gradlew assembleRelease
-  artifacts:
-    paths:
-      - android/app/build/outputs/apk/release/app-debug.apk
+
         
 
