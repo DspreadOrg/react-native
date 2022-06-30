@@ -11,7 +11,8 @@ cache:
     - android/.gradle/
 
 buildapk:
-  stage: test
+  stage: 
+    - build
        
   script:
     - cd android
