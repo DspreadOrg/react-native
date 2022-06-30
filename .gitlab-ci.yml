@@ -9,7 +9,8 @@ cache:
   paths:
     - node_modules/
     - android/.gradle/
-  stages:
+
+stages:
   - build
   - test
   - deploy
