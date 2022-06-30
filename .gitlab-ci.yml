@@ -1,9 +1,9 @@
 image: webcuisine/gitlab-ci-react-native-android
 
 before_script:
-  # - npm install
-   # - export GRADLE_USER_HOME=$(pwd)/.gradle
-   # - chmod +x ./android/gradlew
+   - npm install
+    - export GRADLE_USER_HOME=$(pwd)/.gradle
+    - chmod +x ./android/gradlew
    - yarn
 
 cache:
