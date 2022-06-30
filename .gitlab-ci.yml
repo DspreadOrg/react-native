@@ -10,6 +10,9 @@ cache:
     - node_modules/
     - android/.gradle/
 
+stages:
+  - build
+ 
 job 1:
   stage: build
   script: make build dependencies
