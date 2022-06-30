@@ -9,16 +9,13 @@ cache:
   paths:
     - node_modules/
     - android/.gradle/
-job1:
-  stage: test
-  script:
-  - sh test.sh
-  artifacts:
-    paths:
-    - android/app/build/outputs/apk/debug/app-debug.apk
+
 buildapk:
   stage: build
-        - test
+       .pre  
+       test 
+       deploy
+       .post
   script:
     - cd android
     - chmod +x ./gradlew
