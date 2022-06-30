@@ -13,9 +13,11 @@ cache:
 buildapk:
   stage:
      build
-   - test
-   - release
-       
+   - build
+    - test 
+    - deploy 
+    - post
+          
   script:
     - cd android
     - chmod +x ./gradlew
