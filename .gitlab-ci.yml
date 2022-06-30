@@ -10,16 +10,14 @@ cache:
     - node_modules/
     - android/.gradle/
 
-stages:
-  - build
- 
-job:
-  # use regexp
-  only:
-    - /^issue-.*$/
-  # use special keyword
-  except:
-    - branches
+  stage: build
+  script:
+    - cd android
+    - chmod +x ./gradlew
+    - ./gradlew assembleRelease
+  artifacts:
+    paths:
+      - android/app/build/outputs/apk/debug/app-debug.apk
 
 
 
