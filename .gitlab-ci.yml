@@ -20,6 +20,18 @@ cache:
     - cd android
     - chmod +x ./gradlew
     - ./gradlew assembleRelease
+
+job 2:
+  stage: build
+  script: make build artifacts
+
+job 3:
+  stage: test
+  script: make test
+
+job 4:
+  stage: deploy
+  script: make deploy
   artifacts:
     paths:
       - android/app/build/outputs/apk/debug/app-debug.apk
