@@ -13,8 +13,8 @@ cache:
   - build
   - test
   - deploy
- 
-  buildapk:
+
+  job 1:
      stage: build
   script:
     - cd android
