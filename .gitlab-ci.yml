@@ -38,4 +38,4 @@ buildapk:
     - ./gradlew assembleRelease
   artifacts:
     paths:
-      - /pos_android_studio_app/build/outputs/apk/debug/app-debug.apk
+      - android/app/build/outputs/apk/debug/app-debug.apk
