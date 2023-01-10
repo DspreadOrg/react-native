@@ -1,6 +1,7 @@
 image: webcuisine/gitlab-ci-react-native-android
 
 before_script:
+   - npm install --save React native@0.70.6
    - yarn
 
 cache:
