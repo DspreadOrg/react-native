@@ -8,7 +8,7 @@ before_script:
   # - npm install
    # - export GRADLE_USER_HOME=$(pwd)/.gradle
    # - chmod +x ./android/gradlew
-   - yarn config set ignore-engines true
+   - yarn
   
 
 cache:
@@ -24,9 +24,10 @@ buildapk:
     # - sudo npm cache clean -f
     # - sudo npm install -g n
     # - sudo n stable
-    # - yarn config set ignore-engines true
+   
     # - yarn install
     - cd android
+    - yarn config set ignore-engines true
     # - echo $ANDROID_SDK_HOME
     # - echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;20.0.5594570" --sdk_root=${ANDROID_SDK_ROOT}
     # - echo $ANDROID_NDK_HOME
