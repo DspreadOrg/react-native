@@ -23,6 +23,7 @@ buildapk:
   script:
     - sudo npm cache clean -f
     - sudo npm install -g n latest
+      yarn add react react-dom react-scripts
     - sudo n stable
     - yarn install
     - yarn config set ignore-engines true
