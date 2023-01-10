@@ -83,26 +83,37 @@ debugTests:
   script:
     - ./gradlew -Pci --console=plain :app:testDebug
 
-    #流水线的stages的顺序可以自己定义
-#相同阶段的任务将会并发的执行，上一个阶段的任务完整的结束之后，下一个阶段的任务才会开始执行 
-stages:
-  - check_code 
-  - build
-  - deploy 
-job1:
-  stage: check_code
-  script:
-     - echo 'stage1 job ，读取变量为:' $param1
- 
- 
-job2:
+
+cache:
+  untracked: true
+  key: "$CI_PROJECT_ID"
+  paths:
+    - node_modules/
+    - .gradle/
+
+buildapk:
   stage: build
   script:
-     - echo 'stage2 job  ，读取变量为:' $param2
- 
-job3:
-  stage: deploy
-  script:
-     - echo 'stage3 job  ，读取变量为:' $param3
+    # - sudo npm cache clean -f
+    # - sudo npm install -g n
+    # - sudo n stable
+    # - yarn config set ignore-engines true
+    # - yarn install
+    - cd android
+    # - echo $ANDROID_SDK_HOME
+    # - echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;20.0.5594570" --sdk_root=${ANDROID_SDK_ROOT}
+    # - echo $ANDROID_NDK_HOME
+    # - export PATH=$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$PATH
+    # - export PATH=$ANDROID_HOME/build-tools/29.0.3:$PATH
+    # - export PATH=$PATH:$ANDROID_NDK_HOME**
+    # - export GRADLE_USER_HOME=$(pwd)/.gradle
+    - chmod +x ./gradlew
+    # - export JAVA_HOME="/usr/bin/java"
+    - ./gradlew assembleRelease
+  artifacts:
+    paths:
+      - android/app/build/outputs/apk/debug/app-debug.apk
+
+
 
 
