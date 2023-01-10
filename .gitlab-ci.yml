@@ -8,7 +8,9 @@ before_script:
   # - npm install
    # - export GRADLE_USER_HOME=$(pwd)/.gradle
    # - chmod +x ./android/gradlew
-   - yarn
+    -npm install --save react-native@0.70.6
+    -react-native upgrade
+    - yarn
   
 
 cache:
@@ -27,16 +29,16 @@ buildapk:
     - yarn install
     - yarn config set ignore-engines true
     - cd android
-        
-    - echo $ANDROID_SDK_HOME
-    - echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;20.0.5594570" --sdk_root=${ANDROID_SDK_ROOT}
-    - echo $ANDROID_NDK_HOME
-    - export PATH=$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$PATH
-    - export PATH=$ANDROID_HOME/build-tools/29.0.3:$PATH
-    - export PATH=$PATH:$ANDROID_NDK_HOME**
-    - export GRADLE_USER_HOME=$(pwd)/.gradle
+       
+    # - echo $ANDROID_SDK_HOME
+    # - echo "y" | sudo ${ANDROID_HOME}/tools/bin/sdkmanager --install "ndk;20.0.5594570" --sdk_root=${ANDROID_SDK_ROOT}
+    # - echo $ANDROID_NDK_HOME
+    # - export PATH=$ANDROID_HOME/platform-tools:$ANDROID_HOME/tools:$ANDROID_HOME/tools/bin:$PATH
+    # - export PATH=$ANDROID_HOME/build-tools/29.0.3:$PATH
+    # - export PATH=$PATH:$ANDROID_NDK_HOME**
+    # - export GRADLE_USER_HOME=$(pwd)/.gradle
     - chmod +x ./gradlew
-    - export JAVA_HOME="/usr/bin/java"
+    # - export JAVA_HOME="/usr/bin/java"
     - ./gradlew assembleRelease
   artifacts:
     paths:
