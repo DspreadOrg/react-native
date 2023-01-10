@@ -8,9 +8,7 @@ before_script:
   # - npm install
    # - export GRADLE_USER_HOME=$(pwd)/.gradle
    # - chmod +x ./android/gradlew
-    - npm install --save react-native@0.70.6
-    - react-native upgrade
-    - yarn
+      - yarn
   
 
 cache:
