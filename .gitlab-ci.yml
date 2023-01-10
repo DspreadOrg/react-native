@@ -14,7 +14,8 @@ cache:
 buildapk:
   stage: build
   script:
-    - npm install --save React native@0.70.6
+    - npm install 
+    - save React native@0.70.6
     - cd android
     - chmod +x ./gradlew
     - ./gradlew assembleRelease
