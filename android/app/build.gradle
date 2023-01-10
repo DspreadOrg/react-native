@@ -284,7 +284,7 @@ dependencies {
 //    implementation files('libs\\sun.misc.BASE64Decoder.jar')
 //    implementation 'com.binioter:guideview:1.1.0'
     implementation files('libs\\guideview.jar')
-
+      implementation'com.facebook.react:react-native+'
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
         exclude group:'com.facebook.fbjni'
