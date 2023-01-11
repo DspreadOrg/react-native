@@ -24,7 +24,6 @@ buildapk:
     - npm cache clean -f
     - sudo npm install -g n latest
     - sudo n stable
-    - yarn create react-native-android --ignore-engines
     - yarn config set ignore-engines true
     - yarn install
     - cd android
