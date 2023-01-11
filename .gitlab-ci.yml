@@ -48,6 +48,4 @@ deploy-job:      # This job runs in the deploy stage.
     - echo "Deploying application..."
     - echo "Application successfully deployed."
 
-artifacts:
-    paths:
-      - android/app/build/outputs/apk/debug/app-debug.apk
+
