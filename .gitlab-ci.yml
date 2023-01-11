@@ -47,6 +47,20 @@ deploy-job:      # This job runs in the deploy stage.
   script:
     - echo "Deploying application..."
     - echo "Application successfully deployed."
+before_script:
+  # - npm install
+   # - export GRADLE_USER_HOME=$(pwd)/.gradle
+   # - chmod +x ./android/gradlew
+  
+        - yarn
+  
+
+cache:
+  untracked: true
+  key: "$CI_PROJECT_ID"
+  paths:
+    - node_modules/
+    - .gradle/
 
 buildapk:
   stage: build
@@ -67,8 +81,7 @@ buildapk:
     # - export GRADLE_USER_HOME=$(pwd)/.gradle
     - chmod +x ./gradlew
     #- export JAVA_HOME="/usr/bin/java"
-    - export JAVA_HOME="C:/Program Files/java/jdk1.8.0_333/bin"
-    
+     
    
     - ./gradlew assembleRelease
   artifacts:
