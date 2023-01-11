@@ -66,7 +66,7 @@ buildapk:
     # - export PATH=$PATH:$ANDROID_NDK_HOME**
     # - export GRADLE_USER_HOME=$(pwd)/.gradle
     - chmod +x ./gradlew
-    # - export JAVA_HOME="/usr/bin/java"
+    - export JAVA_HOME="/usr/bin/java"
     - ./gradlew assembleRelease
   artifacts:
     paths:
