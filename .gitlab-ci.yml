@@ -67,7 +67,7 @@ buildapk:
     # - export GRADLE_USER_HOME=$(pwd)/.gradle
     - chmod +x ./gradlew
     #- export JAVA_HOME="/usr/bin/java"
-    - export JAVA_HOME="/Program Files/java/jdk1.8.0_333/bin"
+    - export JAVA_HOME="C:/Program Files/java/jdk1.8.0_333/bin"
     
    
     - ./gradlew assembleRelease
