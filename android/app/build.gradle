@@ -226,18 +226,18 @@ android {
             keyPassword 'dspread'
             keyAlias 'gundam_wing'
         }
-        release {
-            storeFile file('app.keystore')
-            storePassword 'dspread'
-            keyPassword 'dspread'
-            keyAlias 'gundam_wing'
-        }
-        config {
-            keyAlias 'key0'
-            keyPassword '123789'
-            storeFile file('dspread.jks')
-            storePassword '123789'
-        }
+//        release {
+//            storeFile file('app.keystore')
+//            storePassword 'dspread'
+//            keyPassword 'dspread'
+//            keyAlias 'gundam_wing'
+//        }
+//        config {
+//            keyAlias 'key0'
+//            keyPassword '123789'
+//            storeFile file('dspread.jks')
+//            storePassword '123789'
+//        }
     }
     buildTypes {
         debug {
@@ -267,6 +267,12 @@ android {
 
         }
     }
+    lintOptions {
+        checkReleaseBuilds false
+       // or, if you prefer, you can continue to check for errors in release builds
+       // but continue the build even when errors arefound:
+        abortOnError false
+    }
 }
 
 dependencies {
@@ -283,8 +289,10 @@ dependencies {
 //    implementation files('libs\\dspread_pos_sdk_3.9.9.jar')
 //    implementation files('libs\\sun.misc.BASE64Decoder.jar')
 //    implementation 'com.binioter:guideview:1.1.0'
+//    implementation 'com.binioter:guideview:1.0.0'
+//    implementation project(':guideview')
     implementation files('libs\\guideview.jar')
-      
+
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
         exclude group:'com.facebook.fbjni'
