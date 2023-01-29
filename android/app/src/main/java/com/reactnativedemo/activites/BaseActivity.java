@@ -129,14 +129,14 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     public void setToolbarTextColor(int color) {
-        if (toolbar != null) {
-            // change title text color
-            toolbar.setTitleTextColor(color);
-            // change toolbar background color
-            Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);
-            upArrow.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
-            getSupportActionBar().setHomeAsUpIndicator(upArrow);
-        }
+//        if (toolbar != null) {
+//            // change title text color
+//            toolbar.setTitleTextColor(color);
+//            // change toolbar background color                                      abc_ic_ab_back_material
+//            Drawable upArrow = ContextCompat.getDrawable(this, R.drawable.abc_ic_ab_back_material);
+//            upArrow.setColorFilter(color, PorterDuff.Mode.SRC_ATOP);
+//            getSupportActionBar().setHomeAsUpIndicator(upArrow);
+//        }
     }
 
     @TargetApi(21)
@@ -226,7 +226,9 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     private void setOverflowButtonColor(final Activity activity, final PorterDuffColorFilter colorFilter) {
-        final String overflowDescription = activity.getString(R.string.abc_action_menu_overflow_description);
+        //abc_action_menu_overflow_description
+//        final String overflowDescription = activity.getString(R.string.abc_action_menu_overflow_description);
+        final String overflowDescription = activity.getString(com.facebook.react.R.string.menu_description);
         final ViewGroup decorView = (ViewGroup) activity.getWindow().getDecorView();
         final ViewTreeObserver viewTreeObserver = decorView.getViewTreeObserver();
         viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
