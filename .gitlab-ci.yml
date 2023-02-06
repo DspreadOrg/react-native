@@ -39,6 +39,7 @@ buildapk:
     - chmod +x ./gradlew
     # - export JAVA_HOME="/usr/bin/java"
     - ./gradlew assembleRelease
+    - ls
     - ls android/app/build/outputs/apk/
 
   artifacts:
