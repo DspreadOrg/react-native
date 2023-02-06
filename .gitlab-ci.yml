@@ -45,4 +45,4 @@ buildapk:
   artifacts:
     
     paths:
-      -android/app/build/outputs/apk/*
+      - android/app/build/outputs/apk/*
