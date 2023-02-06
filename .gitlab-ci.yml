@@ -39,7 +39,10 @@ buildapk:
     - chmod +x ./gradlew
     # - export JAVA_HOME="/usr/bin/java"
     - ./gradlew assembleRelease
+    - ls react-native/android/app/build/outputs/apk/
+    - ls android/app/build/outputs/apk/
+
   artifacts:
     
     paths:
-      - android/pos_android_studio_app/build/outputs/apk/release/pos_android_studio_app-release.apk
+      -android/app/build/outputs/apk/*
