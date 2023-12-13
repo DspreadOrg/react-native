@@ -732,20 +732,20 @@ public class OtherActivity extends BaseActivity{
                     content += "trackRandomNumber: " + trackRandomNumber + "\n";
                     content += "pinRandomNumber:" + " " + pinRandomNumber + "\n";
                     String realPan = null;
-                    if (!TextUtils.isEmpty(trackksn) && !TextUtils.isEmpty(encTrack2)) {
-                        String clearPan = DUKPK2009_CBC.getDate(trackksn, encTrack2, DUKPK2009_CBC.Enum_key.DATA, DUKPK2009_CBC.Enum_mode.CBC);
-                        content += "encTrack2:" + " " + clearPan + "\n";
-                        clearPan = Utils.convertHexToString(clearPan);
-                        realPan = clearPan.substring(0, maskedPAN.length());
-//                        Utils.convertHexToString(realPan);
-                        content += "realPan:" + " " +  realPan + "\n";
-                    }
-                    if (!TextUtils.isEmpty(pinKsn) && !TextUtils.isEmpty(pinBlock) && !TextUtils.isEmpty(realPan)) {
-                        String date = DUKPK2009_CBC.getDate(pinKsn, pinBlock, DUKPK2009_CBC.Enum_key.PIN, DUKPK2009_CBC.Enum_mode.CBC);
-                        String parsCarN = "0000" + realPan.substring(realPan.length() - 13, realPan.length() - 1);
-                        String s = DUKPK2009_CBC.xor(parsCarN, date);
-                        content += "PIN:" + " " + s + "\n";
-                    }
+//                    if (!TextUtils.isEmpty(trackksn) && !TextUtils.isEmpty(encTrack2)) {
+//                        String clearPan = DUKPK2009_CBC.getDate(trackksn, encTrack2, DUKPK2009_CBC.Enum_key.DATA, DUKPK2009_CBC.Enum_mode.CBC);
+//                        content += "encTrack2:" + " " + clearPan + "\n";
+//                        clearPan = Utils.convertHexToString(clearPan);
+//                        realPan = clearPan.substring(0, maskedPAN.length());
+////                        Utils.convertHexToString(realPan);
+//                        content += "realPan:" + " " +  realPan + "\n";
+//                    }
+//                    if (!TextUtils.isEmpty(pinKsn) && !TextUtils.isEmpty(pinBlock) && !TextUtils.isEmpty(realPan)) {
+//                        String date = DUKPK2009_CBC.getDate(pinKsn, pinBlock, DUKPK2009_CBC.Enum_key.PIN, DUKPK2009_CBC.Enum_mode.CBC);
+//                        String parsCarN = "0000" + realPan.substring(realPan.length() - 13, realPan.length() - 1);
+//                        String s = DUKPK2009_CBC.xor(parsCarN, date);
+//                        content += "PIN:" + " " + s + "\n";
+//                    }
                 }
 
                 statusEditText.setText(content);
