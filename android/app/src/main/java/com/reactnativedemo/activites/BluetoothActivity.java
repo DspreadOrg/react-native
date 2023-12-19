@@ -59,7 +59,7 @@ import com.reactnativedemo.utils.ShowGuideView;
 import com.reactnativedemo.utils.TRACE;
 import com.reactnativedemo.widget.InnerListview;
 import com.dspread.xpos.CQPOSService;
-import com.dspread.xpos.LogFileConfig;
+//import com.dspread.xpos.LogFileConfig;
 import com.dspread.xpos.QPOSService;
 import com.dspread.xpos.QPOSService.CommunicationMode;
 import com.dspread.xpos.QPOSService.Display;
@@ -1533,7 +1533,7 @@ public class BluetoothActivity extends BaseActivity implements ShowGuideView.onG
 //                        } else {
 //                            pos.sendPin(pin);
 //                        }
-                        pos.sendPin(pin);
+                        pos.sendPin(pin.getBytes(),false);
                         dismissDialog();
                     }else{
                         Toast.makeText(BluetoothActivity.this,"The length just can input 4 - 12 digits",Toast.LENGTH_LONG).show();
@@ -1545,7 +1545,7 @@ public class BluetoothActivity extends BaseActivity implements ShowGuideView.onG
                 @Override
                 public void onClick(View v) {
 //					pos.bypassPin();
-                    pos.sendPin("");
+                    pos.sendPin("".getBytes(),false);
 
                     dismissDialog();
                 }
@@ -2448,7 +2448,7 @@ public class BluetoothActivity extends BaseActivity implements ShowGuideView.onG
                     //request permission
                     ActivityCompat.requestPermissions(BluetoothActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_EXTERNAL_STORAGE);
                 } else {
-                    LogFileConfig.getInstance().setWriteFlag(true);
+//                    LogFileConfig.getInstance().setWriteFlag(true);
                     byte[] data = null;
                     List<String> allFiles = null;
 //                    allFiles = FileUtils.getAllFiles(FileUtils.POS_Storage_Dir);

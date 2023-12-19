@@ -60,7 +60,7 @@ import com.reactnativedemo.utils.QPOSUtil;
 import com.reactnativedemo.utils.TRACE;
 import com.reactnativedemo.utils.Utils;
 import com.dspread.xpos.CQPOSService;
-import com.dspread.xpos.LogFileConfig;
+//import com.dspread.xpos.LogFileConfig;
 import com.dspread.xpos.QPOSService;
 import com.dspread.xpos.QPOSService.TransactionType;
 
@@ -1508,7 +1508,7 @@ public class OtherActivity extends BaseActivity{
                             pos.sendEncryptPin("5516422217375116");
 
                         } else {
-                            pos.sendPin(pin);
+                            pos.sendPin(pin.getBytes(),false);
                         }
                         dismissDialog();
                     }
@@ -1520,7 +1520,7 @@ public class OtherActivity extends BaseActivity{
                 @Override
                 public void onClick(View v) {
 //					pos.bypassPin();
-                    pos.sendPin("");
+                    pos.sendPin("".getBytes(),false);
 
                     dismissDialog();
                 }
@@ -2580,7 +2580,7 @@ public class OtherActivity extends BaseActivity{
             //request permission
             ActivityCompat.requestPermissions(OtherActivity.this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_EXTERNAL_STORAGE);
         } else {
-            LogFileConfig.getInstance().setWriteFlag(true);
+//            LogFileConfig.getInstance().setWriteFlag(true);
             byte[] data = null;
             List<String> allFiles = null;
 //                    allFiles = FileUtils.getAllFiles(FileUtils.POS_Storage_Dir);
