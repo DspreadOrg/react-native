@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
@@ -14,6 +15,10 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -45,6 +50,7 @@ public class WelcomeActivity extends BaseActivity implements OnClickListener, De
 		serial_port.setOnClickListener(this);
 		normal_blu.setOnClickListener(this);
 		other_blu.setOnClickListener(this);
+		bluetoothRelaPer();
 	}
 
 	@Override
@@ -86,47 +92,57 @@ public class WelcomeActivity extends BaseActivity implements OnClickListener, De
 				startActivity(intent);
 				break;
 			case R.id.normal_bluetooth://普通蓝牙连接
-				bluetoothRelaPer();
+//				bluetoothRelaPer();
 				intent = new Intent(this, BluetoothActivity.class);
 				intent.putExtra("connect_type", 3);
 				startActivity(intent);
 				break;
 			case R.id.other_bluetooth://其他蓝牙连接，例如：BLE，，，
-				bluetoothRelaPer();
+//				bluetoothRelaPer();
 				intent = new Intent(this, BluetoothActivity.class);
 				intent.putExtra("connect_type", 4);
 				startActivity(intent);
 				break;
 		}
 	}
-
+	private static final int BLUETOOTH_CODE = 100;
 	public void bluetoothRelaPer() {
-		BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-		if (adapter != null && !adapter.isEnabled()) {//表示蓝牙不可用 add one fix
-			Intent enabler = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+		android.bluetooth.BluetoothAdapter adapter = android.bluetooth.BluetoothAdapter.getDefaultAdapter();
+		if (adapter != null && !adapter.isEnabled()) {//if bluetooth is disabled, add one fix
+			Intent enabler = new Intent(android.bluetooth.BluetoothAdapter.ACTION_REQUEST_ENABLE);
 			startActivity(enabler);
 		}
-		lm = (LocationManager) WelcomeActivity.this.getSystemService(WelcomeActivity.this.LOCATION_SERVICE);
+		lm = (LocationManager) this.getSystemService(LOCATION_SERVICE);
 		boolean ok = lm.isProviderEnabled(LocationManager.GPS_PROVIDER);
-		if (ok) {//开了定位服务
-			if (ContextCompat.checkSelfPermission(WelcomeActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
-					!= PackageManager.PERMISSION_GRANTED) {
-				Log.e("POS_SDK", "没有权限");
-				// 没有权限，申请权限。
-				ActivityCompat.requestPermissions(WelcomeActivity.this, new String[]{Manifest.permission.ACCESS_COARSE_LOCATION,
-						Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_CODE);
-//                        Toast.makeText(getActivity(), "没有权限", Toast.LENGTH_SHORT).show();
+		if (ok) {//Location service is on
+			if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+				// Permission denied
+				// Request authorization
+				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+					if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, android.Manifest.permission.BLUETOOTH_ADVERTISE) != PackageManager.PERMISSION_GRANTED) {
+						String[] list = new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION, android.Manifest.permission.BLUETOOTH_SCAN, android.Manifest.permission.BLUETOOTH_CONNECT, android.Manifest.permission.BLUETOOTH_ADVERTISE};
+						ActivityCompat.requestPermissions(this, list, BLUETOOTH_CODE);
+
+					}
+				} else {
+					ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION, android.Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_CODE);
+				}
+//                        Toast.makeText(getActivity(), "Permission Denied", Toast.LENGTH_SHORT).show();
 			} else {
-				// 有权限了，去放肆吧。
-				Log.e("BRG", "有权限");
-//				Toast.makeText(WelcomeActivity.this, "有权限", Toast.LENGTH_SHORT).show();
+				Toast.makeText(this, "Permission Granted", Toast.LENGTH_SHORT).show();
 			}
 		} else {
-			Log.e("BRG", "系统检测到未开启GPS定位服务");
-//			Toast.makeText(WelcomeActivity.this, "系统检测到未开启GPS定位服务", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, "System detects that the GPS location service is not turned on", Toast.LENGTH_SHORT).show();
 			Intent intent = new Intent();
 			intent.setAction(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-			startActivityForResult(intent, 1315);
+			ActivityResultLauncher<Intent> launcher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+				@Override
+				public void onActivityResult(ActivityResult result) {
+				}
+			});
+			launcher.launch(intent);
+
+
 		}
 	}
 
