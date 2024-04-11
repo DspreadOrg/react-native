@@ -1,66 +1,94 @@
 import React, { Component } from 'react';
-import {AppRegistry, Text, TextInput, View, NativeEventEmitter,NativeModules,Button, StyleSheet,DeviceEventEmitter,FlatList, TouchableOpacity, string, ScrollView, Title, Alert, prompt} from 'react-native';
+import {AppRegistry, Text, TextInput, View, EventEmitter,NativeEventEmitter,NativeModules,Button, StyleSheet,DeviceEventEmitter,FlatList, TouchableOpacity, string, ScrollView, Title, Alert, prompt} from 'react-native';
 var pos = NativeModules.NativePosModule;
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 const NativePosEmitter = new NativeEventEmitter(pos);
+
 /**
      * Transaction type.
      */
-const TransactionType = {
-  GOODS : 0, // 货物 GOODS
-  SERVICES : 1, // 服务 service
-  CASH : 2, // 现金 cash
-  CASHBACK : 3, //  返现
-  INQUIRY : 4, // 查询
-  TRANSFER : 5, // 转账
-  ADMIN : 6, // 管理
-  CASHDEPOSIT : 7, // 存款
-  PAYMENT : 8, // 付款 支付
+const TransactionType = [
+  'GOODS', // 货物 GOODS
+  'SERVICES', // 服务 service
+  'CASH', // 现金 cash
+  'CASHBACK', //  返现
+  'INQUIRY', // 查询
+  'TRANSFER', // 转账
+  'ADMIN', // 管理
+  'CASHDEPOSIT', // 存款
+  'PAYMENT', // 付款 支付
 
-  PBOCLOG : 9, // 0x0A /*PBOC日志(电子现金日志)*/
-  SALE : 10, // 0x0B /*消费*/
-  PREAUTH : 11, // 0x0C /*预授权*/
+  'PBOCLOG', // 0x0A /*PBOC日志(电子现金日志)*/
+  'SALES_NEW', // 0x0B /*消费*/
+  'PREAUTH', // 0x0C /*预授权*/
 
-  ECQ_DESIGNATED_LOAD : 12, // 0x10 /*电子现金Q指定账户圈存*/
-  ECQ_UNDESIGNATED_LOAD : 13, // 0x11 /*电子现金费非指定账户圈存*/
-  ECQ_CASH_LOAD : 14, // 0x12 /*电子现金费现金圈存*/
-  ECQ_CASH_LOAD_VOID : 15, // 0x13 /*电子现金圈存撤销*/
-  ECQ_INQUIRE_LOG : 16, // 0x0A /*电子现金日志(和PBOC日志一样)*/
-  REFUND : 17,//退款
-  UPDATE_PIN : 18,     //修改密码
-  SALES_NEW : 19,
-  NON_LEGACY_MONEY_ADD : 20, /* 0x17*/
-  LEGACY_MONEY_ADD : 21,  /*0x16*/
-  BALANCE_UPDATE : 22 /*0x18*/
-}
-var test = NativeModules.JumpModule;
+  'ECQ_DESIGNATED_LOAD', // 0x10 /*电子现金Q指定账户圈存*/
+  'ECQ_UNDESIGNATED_LOAD', // 0x11 /*电子现金费非指定账户圈存*/
+  'ECQ_CASH_LOAD', // 0x12 /*电子现金费现金圈存*/
+  'ECQ_CASH_LOAD_VOID', // 0x13 /*电子现金圈存撤销*/
+  'ECQ_INQUIRE_LOG', // 0x0A /*电子现金日志(和PBOC日志一样)*/
+  'REFUND',//退款
+  'UPDATE_PIN',     //修改密码
+  'SALES_NEW',
+  'NON_LEGACY_MONEY_ADD', /* 0x17*/
+  'LEGACY_MONEY_ADD',  /*0x16*/
+  'BALANCE_UPDATE', /*0x18*/
+];
+const communicationMode = [
+  'BLUETOOTH',
+  'BLUETOOTH_BLE',
+  'UART',
+  'USB_OTG_CDC_ACM',
+  'AUDIO',
+   ];
+
+
+var test = NativeModules.NativePosModule;
 export default class catComponent extends Component {
  
   render() {
       return (
             <View style = {this.styles.container}>
-							
-			<Button title="Start Now!" onPress={this.scanBluetooth2android}/>
+        							
+			{/* <Button title="Start Now!" onPress={this.scanBluetooth2android}/> */}
 				
+        
             <FlatList
             ListHeaderComponent={
+                           
                 <View>
-                    <TouchableOpacity onPress={this.scanBluetooth.bind(this)} style = {this.styles.button}>
+                   <View style = {this.styles.container}>
+                      {/* <TouchableOpacity onPress={this.initPosBluetooth.bind(this)} style = {this.styles.button}>
+                      <Text style={this.styles.text}>initPos Bluetooth</Text>                                          
+                      </TouchableOpacity>  */}
+                      <TouchableOpacity onPress={this.scanBluetooth.bind(this)} style = {this.styles.button}>
                       <Text style={this.styles.text}>Scan Bluetooth</Text>
+                      </TouchableOpacity> 
+                      <TouchableOpacity onPress={this.disconnect} style = {this.styles.button}>
+                      <Text style={this.styles.text}>Disconnect</Text>
+                    </TouchableOpacity>    
+                   </View>
+                     <View style = {this.styles.container}>
+                     <TouchableOpacity onPress={this.initPosUART.bind(this)} style = {this.styles.button}>
+                      <Text style={this.styles.text}>Open UART</Text>                                            
                     </TouchableOpacity>  
-                    <TouchableOpacity onPress={this.doTrade} style = {this.styles.button}>
-                      <Text style={this.styles.text}>doTrade</Text>
+                    <TouchableOpacity onPress={this.closeUart} style = {this.styles.button}>
+                      <Text style={this.styles.text}>Close Uart</Text>
+                    </TouchableOpacity>                 
+                    </View>
+                   
+                    <TouchableOpacity onPress={this.doTrade} style = {this.styles.buttons}>
+                      <Text style={this.styles.text}>DoTrade</Text>
                     </TouchableOpacity>  
-                    <TouchableOpacity onPress={this.disconnect} style = {this.styles.button}>
-                      <Text style={this.styles.text}>disconnect</Text>
-                    </TouchableOpacity>
+                    <View style = {this.styles.container}>
                     <TouchableOpacity onPress={this.getQposId} style = {this.styles.button}>
-                      <Text style={this.styles.text}>getQposId</Text>
+                      <Text style={this.styles.text}>GetQposId</Text>
                     </TouchableOpacity> 
                     <TouchableOpacity onPress={this.getQposInfo} style = {this.styles.button}>
-                      <Text style={this.styles.text}>getQposInfo</Text>
+                      <Text style={this.styles.text}>GetQposInfo</Text>
                     </TouchableOpacity>   
-                    <Text style = {this.styles.textStyle}>Bluetooth Name</Text>        
+                    </View>
+                    {/* <Text style = {this.styles.textStyle}>Bluetooth Name</Text>         */}
                  </View>
                 }
                 
@@ -78,6 +106,9 @@ export default class catComponent extends Component {
             </View>
       )
   }
+
+
+
 scanBluetooth2android(){
 		//test.jump();
 		test.jump
@@ -102,8 +133,10 @@ scanBluetooth2android(){
       transactionData: "",
      });
   }
+// 获取数据列表
 
   onScanningResult(msg){  
+   
     var message = msg.key + "\n" + msg.result;
     console.log("js",message);
 
@@ -116,10 +149,14 @@ scanBluetooth2android(){
      
       this.setState({
            bluetoothName : pages
+          
       });
     }else if(msg.key == "onRequestQposConnected"){
       this.setState({
-        transactionData : message
+           bluetoothName: [],
+          transactionData: "",
+    
+          transactionData : message
       });
 
     }else if(msg.key == "onRequestQposDisconnected"){
@@ -151,12 +188,12 @@ scanBluetooth2android(){
       this.setState({
         transactionData : message
       });
-      pos.setAmount("123","","0156",TransactionType.GOODS);
-    }else if(msg.key == "onRequestPinEntry"){
+      pos.setAmount("123","","0156",TransactionType[0]);
+    }else if(msg.key == "onRequestSetPin"){
       this.setState({
         transactionData : message
       });
-      pos.sendPinEntryResult("1234") 
+      pos.sendPin("1234") 
     }else if(msg.key == "onDoTradeResult"){
       this.setState({
         transactionData : message
@@ -206,31 +243,51 @@ scanBluetooth2android(){
         this.setState({
           transactionData : message
        });
+    }else if(msg.key=="onError"){
+      this.setState({
+        transactionData : message
+     });
+
     }
    
    }
    _onPressItem(item) {
-    pos.stopQPos2Mode();
+  
     console.log("connectBluetooth: " + item.key);
     pos.connectBT(item.key);
    }
   /**
    * RN调用Native且通过Callback回调 通信方式
    */
-   scanBluetooth(msg) {
+
+  
+    // initPosBluetooth(msg){
+    //   pos.initPos(communicationMode[0]);
+    // }
+    scanBluetooth(msg) {
       this.setState({
            bluetoothName : []
       });
       console.log("scanBluetooth");
+      pos.initPos(communicationMode[0]);
       pos.scanQPos2Mode(10);
    }
-
+   initPosUART(msg){
+    pos.initPos(communicationMode[2]);
+  }
+   closeUart(msg){
+     pos.closeUart();
+  }
    doTrade(msg) {
       console.log("doTrade");
       pos.doTrade(0,20);
    }
 
    disconnect(msg) {
+    this.state = ({
+      bluetoothName: [],
+      transactionData: "",
+  });
       console.log("disconnect");
       pos.disconnectBT();
    }
@@ -248,9 +305,10 @@ scanBluetooth2android(){
   styles = StyleSheet.create({
 
    container:{
-      marginTop : 10,
-      marginLeft: 10,
-      marginRight:10,
+       // marginTop : 10,
+      // marginLeft: 10,
+      // marginRight:10,
+      flexDirection: 'row', 
     },
     
     text:{
@@ -266,6 +324,7 @@ scanBluetooth2android(){
 
     textStyle:{
       fontSize : 17,
+      padding:5,
       marginBottom : 10
     },
 
@@ -275,12 +334,26 @@ scanBluetooth2android(){
     },
 
     button:{
+        marginTop:5,
         backgroundColor : "#4CAF50",
         height : 40,
+        marginLeft:10,
+        marginRight:10,
         marginBottom : 10,
-        borderRadius : 8
+        borderRadius : 8,
+        width:'43%'
+        // width:140
     },
-
+    buttons:{
+      marginTop:5,
+      backgroundColor : "#4CAF50",
+      height : 40,
+      marginLeft:10,
+      marginRight:10,
+      marginBottom : 10,
+      borderRadius : 8,
+      // width:140
+  },
     scrollView:{
        marginTop : 10,
        marginBottom : 20
@@ -290,6 +363,7 @@ scanBluetooth2android(){
         padding:10,
         fontSize:18,
         height:44,
+        
     },
   });
 }

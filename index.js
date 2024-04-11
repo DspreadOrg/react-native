@@ -12,43 +12,49 @@ import{
   NativeModules,
   Alert
 } from "react-native";
+import App from './App';
+import {name as appName} from './app.json';
 // import catComponent from './catComponent';
-var pos = NativeModules.NativePosModule;
-var test = NativeModules.JumpModule;
-class WelcomeGuide extends React.Component{
-	render(){
-		return(
-				<View style={styles.container}>
-					<Button title="Start Now!" onPress={this.scanBluetooth}/>
-				</View>
-			)
-	}
+AppRegistry.registerComponent(appName, () => App);
+// var pos = NativeModules.NativePosModule;
+// var test = NativeModules.JumpModule;
+// class WelcomeGuide extends React.Component{
+// 	render(){
+// 		return(
+// 				<View style={styles.container}>
+// 					<Button title="Start Now!" onPress={this.scanBluetooth}/>
+// 				</View>
+// 			)
+// 	}
 
-	scanBluetooth(){
-		test.jump();
-	}
-}  
+// 	scanBluetooth(){
+// 		test.jump();
 
-const styles = StyleSheet.create({
-	container:{
-		flex:1,
-		justifyContent:'center'
-	},
-	hello:{
-		fontSize:20,
-		textAlign:'center',
-		margin:10
-	},
-	fixToRow:{
-		flexDirection:'row',
-		justifyContent:'space-between',
-		marginTop:20,
-		marginHorizontal:16,
-	}
-});
+// 	}
+// }
 
-AppRegistry.registerComponent(
-	"ReactNativeDemo",
-	() => WelcomeGuide
-);
+
+
+// const styles = StyleSheet.create({
+// 	container:{
+// 		flex:1,
+// 		justifyContent:'center'
+// 	},
+// 	hello:{
+// 		fontSize:20,
+// 		textAlign:'center',
+// 		margin:10
+// 	},
+// 	fixToRow:{
+// 		flexDirection:'row',
+// 		justifyContent:'space-between',
+// 		marginTop:20,
+// 		marginHorizontal:16,
+// 	}
+// });
+
+// AppRegistry.registerComponent(
+// 	"ReactNativeDemo",
+// 	() => WelcomeGuide
+// );
 

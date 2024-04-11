@@ -1,4 +1,4 @@
-package com.reactnativedemo.keyboard;
+package com.reactnativedemo.keyboard.keyboard;
 
 /**
  * Time:2020/4/26

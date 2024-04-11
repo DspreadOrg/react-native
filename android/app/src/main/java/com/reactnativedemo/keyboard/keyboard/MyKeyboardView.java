@@ -1,4 +1,4 @@
-package com.reactnativedemo.keyboard;
+package com.reactnativedemo.keyboard.keyboard;
 
 import android.app.Activity;
 import android.content.Context;
@@ -20,21 +20,18 @@ import java.util.List;
 
 /**
  * ****************************************************************
- * 文件名称: MyKeyboardView
- * 作    者: Created by gyd
- * 创建时间: 2018/11/29 17:20
- * 文件描述: 自定义键盘，支持多种键盘切换
- * 注意事项: 密码输入
+ * File Name: MyKeyboardView
+ * File Description: Keyboard View
  * ****************************************************************
  */
 public class MyKeyboardView extends KeyboardView {
-    public static final int KEYBOARDTYPE_Num = 0;//数字键盘
-    public static final int KEYBOARDTYPE_Num_Pwd = 1;//数字键盘（密码）
-    public static final int KEYBOARDTYPE_ABC = 2;//字母键盘
-    public static final int KEYBOARDTYPE_Symbol = 4;//符号键盘
-    public static final int KEYBOARDTYPE_Only_Num_Pwd = 5;//数字键盘（密码）(不能切换其他键盘)
+    public static final int KEYBOARDTYPE_Num = 0;//Number  keyboard
+    public static final int KEYBOARDTYPE_Num_Pwd = 1;//Number type keyboard(password)
+    public static final int KEYBOARDTYPE_ABC = 2;//letter keyboard
+    public static final int KEYBOARDTYPE_Symbol = 4;//symbol keyboard
+    public static final int KEYBOARDTYPE_Only_Num_Pwd = 5;//only number keyboard
 
-    private final String strLetter = "abcdefghijklmnopqrstuvwxyz";//字母
+    private final String strLetter = "abcdefghijklmnopqrstuvwxyz";//letter
 
     private EditText mEditText;
     private PopupWindow mWindow;
@@ -45,11 +42,11 @@ public class MyKeyboardView extends KeyboardView {
     private Keyboard keyboardOnlyNumPwd;
     private Keyboard keyboardABC;
     private Keyboard keyboardSymbol;
-    private int mHeightPixels;//屏幕高度
+    private int mHeightPixels;//screen height
 
-    public boolean isSupper = false;//字母键盘 是否大写
-    public boolean isPwd = false;//数字键盘 是否随机
-    private int keyBoardType;//键盘类型
+    public boolean isSupper = false;//whether the letter keyboard is capitalized
+    public boolean isPwd = false;//whether the numbers on the number keyboard are random
+    private int keyBoardType;//keyboard type
     private List<String> dataList = new ArrayList<>();
 
     public MyKeyboardView(Context context, AttributeSet attrs) {
@@ -60,15 +57,15 @@ public class MyKeyboardView extends KeyboardView {
         super(context, attrs, defStyle);
     }
 
-    public void setHeight(int mHeightPixels){
+    public void setHeight(int mHeightPixels) {
         this.mHeightPixels = mHeightPixels;
     }
 
-    public void setContext(Activity mActivity){
+    public void setContext(Activity mActivity) {
         this.mActivity = mActivity;
     }
 
-    public void init(EditText editText, PopupWindow window, int keyBoardType,List<String> dataList) {
+    public void init(EditText editText, PopupWindow window, int keyBoardType, List<String> dataList) {
         this.dataList = dataList;
         this.mEditText = editText;
         this.mWindow = window;
@@ -87,7 +84,7 @@ public class MyKeyboardView extends KeyboardView {
     }
 
     /**
-     * 设置键盘类型
+     * set keyboard type
      */
     public void setKeyBoardType(int keyBoardType) {
         switch (keyBoardType) {
@@ -98,24 +95,28 @@ public class MyKeyboardView extends KeyboardView {
                 setKeyboard(keyboardNum);
                 break;
             case KEYBOARDTYPE_ABC:
-                if (keyboardABC == null)
+                if (keyboardABC == null) {
                     keyboardABC = new Keyboard(getContext(), R.xml.keyboard_abc);
+                }
                 setKeyboard(keyboardABC);
                 break;
             case KEYBOARDTYPE_Num_Pwd:
-                if (keyboardNumPwd == null)
+                if (keyboardNumPwd == null) {
                     keyboardNumPwd = new Keyboard(getContext(), R.xml.keyboard_number);
+                }
                 randomKey(keyboardNumPwd);
                 setKeyboard(keyboardNumPwd);
                 break;
             case KEYBOARDTYPE_Symbol:
-                if (keyboardSymbol == null)
+                if (keyboardSymbol == null) {
                     keyboardSymbol = new Keyboard(getContext(), R.xml.keyboard_symbol);
+                }
                 setKeyboard(keyboardSymbol);
                 break;
             case KEYBOARDTYPE_Only_Num_Pwd:
-                if (keyboardOnlyNumPwd == null)
+                if (keyboardOnlyNumPwd == null) {
                     keyboardOnlyNumPwd = new Keyboard(getContext(), R.xml.keyboard_only_number);
+                }
                 randomKey(keyboardOnlyNumPwd);
                 setKeyboard(keyboardOnlyNumPwd);
                 break;
@@ -148,42 +149,42 @@ public class MyKeyboardView extends KeyboardView {
             Editable editable = mEditText.getText();
             int start = mEditText.getSelectionStart();
             switch (primaryCode) {
-                case Keyboard.KEYCODE_DELETE://回退
+                case Keyboard.KEYCODE_DELETE://go back
                     if (editable != null && editable.length() > 0) {
                         if (start > 0) {
                             editable.delete(start - 1, start);
                         }
                     }
                     break;
-                case Keyboard.KEYCODE_SHIFT://大小写切换
+                case Keyboard.KEYCODE_SHIFT://switch uppercase or lowercase
                     changeKey();
                     setKeyBoardType(KEYBOARDTYPE_ABC);
                     break;
-                case Keyboard.KEYCODE_CANCEL:// 隐藏
-                case Keyboard.KEYCODE_DONE:// 确认
+                case Keyboard.KEYCODE_CANCEL:// hide
+                case Keyboard.KEYCODE_DONE:// confirm
                     mWindow.dismiss();
                     break;
-                case 123123://切换数字键盘
+                case 123123://switch number keyboard
                     if (isPwd) {
                         setKeyBoardType(KEYBOARDTYPE_Num_Pwd);
                     } else {
                         setKeyBoardType(KEYBOARDTYPE_Num);
                     }
                     break;
-                case 456456://切换字母键盘
-                    if (isSupper)//如果当前为大写键盘，改为小写
+                case 456456://switch letter keyboard
+                    if (isSupper)//if the current keyboard is uppercase, change to lowercase
                     {
                         changeKey();
                     }
                     setKeyBoardType(KEYBOARDTYPE_ABC);
                     break;
-                case 789789://切换符号键盘
+                case 789789://switch symbol keyboard
                     setKeyBoardType(KEYBOARDTYPE_Symbol);
                     break;
-                case 666666://人名分隔符·
+                case 666666:// name Delimiter"·"
                     editable.insert(start, "·");
                     break;
-                default://字符输入
+                default://input symbol
                     editable.insert(start, Character.toString((char) primaryCode));
             }
         }
@@ -215,18 +216,18 @@ public class MyKeyboardView extends KeyboardView {
     };
 
     /**
-     * 键盘大小写切换
+     * switch keyboard uppercase or lowercase
      */
     private void changeKey() {
         List<Keyboard.Key> keylist = keyboardABC.getKeys();
-        if (isSupper) {// 大写切小写
+        if (isSupper) {// switch uppercase to lowercase
             for (Keyboard.Key key : keylist) {
                 if (key.label != null && strLetter.contains(key.label.toString().toLowerCase())) {
                     key.label = key.label.toString().toLowerCase();
                     key.codes[0] = key.codes[0] + 32;
                 }
             }
-        } else {// 小写切大写
+        } else {// Switch lowercase to uppercase
             for (Keyboard.Key key : keylist) {
                 if (key.label != null && strLetter.contains(key.label.toString().toLowerCase())) {
                     key.label = key.label.toString().toUpperCase();
@@ -238,14 +239,15 @@ public class MyKeyboardView extends KeyboardView {
     }
 
     public static KeyBoardNumInterface keyBoardNumInterface;
+
     /**
-     * 数字键盘随机
+     * random number keyboard
      * code 48-57 (0-9)
      */
     public void randomKey(Keyboard pLatinKeyboard) {
         int[] ayRandomKey = new int[13];
-        for(int i = 0; i < dataList.size() ; i ++){
-            ayRandomKey[i]=Integer.valueOf(dataList.get(i),16);
+        for (int i = 0; i < dataList.size(); i++) {
+            ayRandomKey[i] = Integer.valueOf(dataList.get(i), 16);
         }
 //        int[] ayRandomKey = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 //        Random random = new Random();
@@ -257,36 +259,36 @@ public class MyKeyboardView extends KeyboardView {
 //        }
         List<Keyboard.Key> pKeyLis = pLatinKeyboard.getKeys();
         int index = 0;
-        int sy = 0;
-//        int sy = mHeightPixels-80*5-8*4;//D20是60和6，D1000是80和8
+        int sy = mHeightPixels - pLatinKeyboard.getHeight();
+//        int sy = mHeightPixels-80*5-8*4;//D20 is 60 and 6，D1000 is 80 and 8
 //        Tip.i("sy = "+sy);
         StringBuilder s = new StringBuilder();
         for (int i = 0; i < pKeyLis.size(); i++) {
-            if(i == 0){
-                sy = mHeightPixels-pKeyLis.get(i).height*5-pKeyLis.get(i).x*6;//动态计算间隔值
-            }
+//            if(i == 0){
+//                sy = mHeightPixels-pKeyLis.get(i).height*5-pKeyLis.get(i).x*6;//calculate interval value
+//            }
             int code = pKeyLis.get(i).codes[0];
             int y = sy + pKeyLis.get(i).y;
             int x = pKeyLis.get(i).x;
             int rit = x + pKeyLis.get(i).width;
             int riby = y + pKeyLis.get(i).height;
             String label;
-            if (code >= 0) {//number 值
+            if (code >= 0) {//number value
                 pKeyLis.get(i).label = ayRandomKey[index] + "";
                 pKeyLis.get(i).codes[0] = 48 + ayRandomKey[index];
-                String locationStr = QPOSUtil.byteArray2Hex(QPOSUtil.intToByteArray(ayRandomKey[index]))+ QPOSUtil.byteArray2Hex(QPOSUtil.intToByteArray(x))+ QPOSUtil.byteArray2Hex(QPOSUtil.intToByteArray(y))
+                String locationStr = QPOSUtil.byteArray2Hex(QPOSUtil.intToByteArray(ayRandomKey[index])) + QPOSUtil.byteArray2Hex(QPOSUtil.intToByteArray(x)) + QPOSUtil.byteArray2Hex(QPOSUtil.intToByteArray(y))
                         + QPOSUtil.byteArray2Hex(QPOSUtil.intToByteArray(rit)) + QPOSUtil.byteArray2Hex(QPOSUtil.intToByteArray(riby));
                 s.append(locationStr);
                 index++;
-            }else{
-                if(code == -3){
+            } else {
+                if (code == -3) {
                     label = QPOSUtil.byteArray2Hex(QPOSUtil.intToByteArray(13));
-                }else if(code == -4){
+                } else if (code == -4) {
                     label = QPOSUtil.byteArray2Hex(QPOSUtil.intToByteArray(15));
-                }else{
+                } else {
                     label = QPOSUtil.byteArray2Hex(QPOSUtil.intToByteArray(14));
                 }
-                String locationStr = label + QPOSUtil.byteArray2Hex(QPOSUtil.intToByteArray(x))+ QPOSUtil.byteArray2Hex(QPOSUtil.intToByteArray(y))
+                String locationStr = label + QPOSUtil.byteArray2Hex(QPOSUtil.intToByteArray(x)) + QPOSUtil.byteArray2Hex(QPOSUtil.intToByteArray(y))
                         + QPOSUtil.byteArray2Hex(QPOSUtil.intToByteArray(rit)) + QPOSUtil.byteArray2Hex(QPOSUtil.intToByteArray(riby));
                 s.append(locationStr);
             }
@@ -294,17 +296,17 @@ public class MyKeyboardView extends KeyboardView {
         keyBoardNumInterface.getNumberValue(s.toString());
     }
 
-    public static void setKeyBoardListener(KeyBoardNumInterface mkeyBoardNumInterface){
+    public static void setKeyBoardListener(KeyBoardNumInterface mkeyBoardNumInterface) {
         keyBoardNumInterface = mkeyBoardNumInterface;
     }
 
     @Override
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        if (keyBoardType == KEYBOARDTYPE_Only_Num_Pwd) {//纯数字键盘，删除按钮特殊绘制
+        if (keyBoardType == KEYBOARDTYPE_Only_Num_Pwd) {//only number keyboard
             List<Keyboard.Key> keys = getKeyboard().getKeys();
             for (Keyboard.Key key : keys) {
-                if (key.codes[0] == -5) {//删除按钮
+                if (key.codes[0] == -5) {//delete button
                     Drawable dr = getContext().getResources().getDrawable(R.drawable
                             .keyboard_white);
                     dr.setBounds(key.x, key.y, key.x + key.width, key.y + key.height);
@@ -314,7 +316,7 @@ public class MyKeyboardView extends KeyboardView {
                     key.icon.setBounds(drawableX, drawableY, drawableX + key.icon
                             .getIntrinsicWidth(), drawableY + key.icon.getIntrinsicHeight());
                     key.icon.draw(canvas);
-                    Log.i("test","drawableX: " +drawableX+" drawableY: "+drawableY);
+                    Log.i("test", "drawableX: " + drawableX + " drawableY: " + drawableY);
                 }
 //                Log.i("test","x: " +key.x+" y: "+key.y+" wi:"+key.width+" he:"+key.height);
 
