@@ -290,6 +290,7 @@ typedef NS_ENUM(NSInteger,MifareCardOperationType){
 
 @optional
 -(void)onRequestWaitingUser;
+-(void)onTradeCancelled;
 -(void)onRequestPinEntry;
 -(void)onQposIdResult: (NSDictionary*)posId;
 -(void)onQposInfoResult: (NSDictionary*)posInfoData;

@@ -44,7 +44,7 @@ RCT_EXPORT_METHOD(disconnectBT){
   [self.pos disconnectBT];
 }
 
-RCT_EXPORT_METHOD(setCardTradeMode:(CardTradeMode)aCardTMode){
+RCT_EXPORT_METHOD(setCardTradeMode:(NSInteger)aCardTMode){
   [self.pos setCardTradeMode:aCardTMode];
 }
 
@@ -56,12 +56,20 @@ RCT_EXPORT_METHOD(doTrade:(NSInteger)keyIndex delays:(NSInteger)timeout){
   [self.pos doTrade:keyIndex delays:timeout];
 }
 
-RCT_EXPORT_METHOD(doCheckCard:(NSInteger) timeout keyIndex:(NSInteger) mKeyIndex){
+RCT_EXPORT_METHOD(doCheckCard:(NSInteger)timeout keyIndex:(NSInteger) mKeyIndex){
   [self.pos doCheckCard:timeout keyIndex:mKeyIndex];
 }
 
-RCT_EXPORT_METHOD(doEmvApp:(EmvOption)aemvOption){
+RCT_EXPORT_METHOD(sendTime:(NSString *)aterminalTime){
+  [self.pos sendTime:aterminalTime];
+}
+
+RCT_EXPORT_METHOD(doEmvApp:(NSInteger)aemvOption){
   [self.pos doEmvApp:aemvOption];
+}
+
+RCT_EXPORT_METHOD(selectEmvApp: (NSInteger)index){
+  [self.pos selectEmvApp:index];
 }
 
 RCT_EXPORT_METHOD(setAmount: (NSString *)aAmount aAmountDescribe:(NSString *)aAmountDescribe currency:(NSString *)currency transactionType:(NSInteger)transactionType){
@@ -74,6 +82,14 @@ RCT_EXPORT_METHOD(sendPinEntryResult:(NSString *)pin){
 
 RCT_EXPORT_METHOD(sendOnlineProcessResult:(NSString *)tlv){
   [self.pos sendOnlineProcessResult:tlv];
+}
+
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getNFCBatchData){
+  return [self.pos getNFCBatchData];
+}
+
+RCT_EXPORT_BLOCKING_SYNCHRONOUS_METHOD(getICCTag:(NSInteger)encryptType cardType:(NSInteger)cardType tagCount:(NSInteger) mTagCount tagArrStr:(NSString*)mTagArrStr){
+  return [self.pos getICCTag:encryptType cardType:cardType tagCount:mTagCount tagArrStr:mTagArrStr];
 }
 
 RCT_EXPORT_METHOD(getQPosId){
@@ -103,12 +119,21 @@ RCT_EXPORT_METHOD(doUpdateIPEKOperation:(NSString *)groupKey
                   pinipek:(NSString *)pinipek
         pinipekcheckValue:(NSString *)pinipekcheckValue){
   [self.pos doUpdateIPEKOperation:groupKey tracksn:trackksn trackipek:trackipek trackipekCheckValue:trackipekCheckValue emvksn:emvksn emvipek:emvipek emvipekcheckvalue:emvipekcheckvalue pinksn:pinksn pinipek:pinipek pinipekcheckValue:pinipekcheckValue block:^(BOOL isSuccess, NSString *stateStr) {
-    [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"doUpdateIPEKOperation",@"result":@(isSuccess)}];
+    NSString *result = isSuccess? @"success":@"fail";
+    [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"doUpdateIPEKOperation",@"result":result,@"data":@""}];
   }];
 }
 
 RCT_EXPORT_METHOD(updateEMVConfigByXml:(NSString *)xmlStr){
   [self.pos updateEMVConfigByXml:xmlStr];
+}
+
+RCT_EXPORT_METHOD(resetPosStatus){
+  [self.pos resetPosStatus];
+}
+
+RCT_EXPORT_METHOD(cancelTrade:(BOOL)isUserCancel){
+  [self.pos cancelTrade:true];
 }
 
 -(void)scanBluetooth:(NSInteger)time{
@@ -136,7 +161,7 @@ RCT_EXPORT_METHOD(updateEMVConfigByXml:(NSString *)xmlStr){
 
 -(void)onBluetoothName2Mode:(NSString *)bluetoothName{
 //    NSLog(@"+++onBluetoothName2Mode %@",bluetoothName);
-    [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onBluetoothName2Mode",@"result":bluetoothName}];
+    [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onBluetoothName2Mode",@"result":bluetoothName,@"data":@""}];
 }
 
 -(void)finishScanQPos2Mode{
@@ -163,429 +188,303 @@ RCT_EXPORT_METHOD(updateEMVConfigByXml:(NSString *)xmlStr){
 //bluetooth connected
 -(void) onRequestQposConnected{
 //    NSLog(@"onRequestQposConnected");
-    [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onRequestQposConnected",@"result":@""}];
+    [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onRequestQposConnected",@"result":@"",@"data":@""}];
 }
 
 //connect bluetooh fail
 -(void) onRequestQposDisconnected{
 //    NSLog(@"onRequestQposDisconnected");
-    [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onRequestQposDisconnected",@"result":@""}];
+    [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onRequestQposDisconnected",@"result":@"",@"data":@""}];
 }
 
 //No Qpos Detected
 -(void) onRequestNoQposDetected{
 //    NSLog(@"onRequestNoQposDetected");
-    [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onRequestNoQposDetected",@"result":@""}];
+    [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onRequestNoQposDetected",@"result":@"",@"data":@""}];
 }
 
 // Prompt user to insert/swipe/tap card
 -(void) onRequestWaitingUser{
 //    NSLog(@"onRequestWaitingUser");
-    [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onRequestWaitingUser",@"result":@""}];
+    [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onRequestWaitingUser",@"result":@"",@"data":@""}];
 }
 
 //input transaction amount
 -(void) onRequestSetAmount{
 //    NSLog(@"onRequestSetAmount");
-    [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onRequestSetAmount",@"result":@""}];
+    [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onRequestSetAmount",@"result":@"",@"data":@""}];
 }
 
 //callback of input pin on phone
 -(void) onRequestPinEntry{
 //    NSLog(@"onRequestPinEntry");
-    [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onRequestPinEntry",@"result":@""}];
+    [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onRequestPinEntry",@"result":@"",@"data":@""}];
 }
 
 //return NFC and swipe card data on this function.
 -(void) onDoTradeResult: (DoTradeResult)result DecodeData:(NSDictionary*)decodeData{
     if (result == DoTradeResult_NONE) {
 //        NSLog(@"No card detected. Please insert or swipe card again and press check card.");
-        [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onDoTradeResult",@"result":@"No card detected. Please insert or swipe card again and press check card."}];
+        [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onDoTradeResult",@"result":@"DoTradeResult_NONE",@"data":@"No card detected. Please insert or swipe card again and press check card."}];
     }else if (result==DoTradeResult_ICC) {
 //        NSLog(@"ICC Card Inserted");
         //Use this API to activate chip card transactions
-        [self.pos doEmvApp:EmvOption_START];
+      [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onDoTradeResult",@"result":@"DoTradeResult_ICC",@"data":@"ICC Card Inserted"}];
     }else if(result==DoTradeResult_NOT_ICC){
 //        NSLog(@"Card Inserted (Not ICC)");
-        [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onDoTradeResult",@"result":@"Card Inserted (Not ICC)"}];
+      [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onDoTradeResult",@"result":@"DoTradeResult_NOT_ICC",@"data":@"Card Inserted (Not ICC)"}];
     }else if(result==DoTradeResult_MCR){
-        NSString *formatID = [NSString stringWithFormat:@"Format ID: %@\n",decodeData[@"formatID"]] ;
-        NSString *maskedPAN = [NSString stringWithFormat:@"Masked PAN: %@\n",decodeData[@"maskedPAN"]];
-        NSString *expiryDate = [NSString stringWithFormat:@"Expiry Date: %@\n",decodeData[@"expiryDate"]];
-        NSString *cardHolderName = [NSString stringWithFormat:@"Cardholder Name: %@\n",decodeData[@"cardholderName"]];
-        NSString *serviceCode = [NSString stringWithFormat:@"Service Code: %@\n",decodeData[@"serviceCode"]];
-        NSString *encTrack1 = [NSString stringWithFormat:@"Encrypted Track 1: %@\n",decodeData[@"encTrack1"]];
-        NSString *encTrack2 = [NSString stringWithFormat:@"Encrypted Track 2: %@\n",decodeData[@"encTrack2"]];
-        NSString *encTrack3 = [NSString stringWithFormat:@"Encrypted Track 3: %@\n",decodeData[@"encTrack3"]];
-        NSString *pinKsn = [NSString stringWithFormat:@"PIN KSN: %@\n",decodeData[@"pinKsn"]];
-        NSString *trackksn = [NSString stringWithFormat:@"Track KSN: %@\n",decodeData[@"trackksn"]];
-        NSString *pinBlock = [NSString stringWithFormat:@"pinBlock: %@\n",decodeData[@"pinblock"]];
-        NSString *encPAN = [NSString stringWithFormat:@"encPAN: %@\n",decodeData[@"encPAN"]];
-        NSString *msg = [NSString stringWithFormat:@"Card Swiped:\n"];
-        msg = [msg stringByAppendingString:formatID];
-        msg = [msg stringByAppendingString:maskedPAN];
-        msg = [msg stringByAppendingString:expiryDate];
-        msg = [msg stringByAppendingString:cardHolderName];
-        msg = [msg stringByAppendingString:pinKsn];
-        msg = [msg stringByAppendingString:trackksn];
-        msg = [msg stringByAppendingString:serviceCode];
-        msg = [msg stringByAppendingString:encTrack1];
-        msg = [msg stringByAppendingString:encTrack2];
-        msg = [msg stringByAppendingString:encTrack3];
-        msg = [msg stringByAppendingString:pinBlock];
-        msg = [msg stringByAppendingString:encPAN];
-        [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onDoTradeResult",@"result":[NSString stringWithFormat:@"MSR||%@",msg]}];
-//        NSString *a = [QPOSQPOSUtil byteArray2Hex:[QPOSQPOSUtil stringFormatTAscii:maskedPAN]];
-//        [self.pos getPin:1 keyIndex:0 maxLen:6 typeFace:@"Pls Input Pin" cardNo:maskedPAN data:@"" delay:30 withResultBlock:^(BOOL isSuccess, NSDictionary *result) {
-//            NSLog(@"result: %@",result);
-//            self.textViewLog.backgroundColor = [UIColor greenColor];
-//            [self playAudio];
-//            AudioServicesPlaySystemSound (kSystemSoundID_Vibrate);
-//            self.textViewLog.text = msg;
-//            self.lableAmount.text = @"";
-//        }];
-//
-//        self.textViewLog.backgroundColor = [UIColor greenColor];
-//        [self playAudio];
-//        AudioServicesPlaySystemSound (kSystemSoundID_Vibrate);
-//        self.textViewLog.text = msg;
-//        self.lableAmount.text = @"";
+      [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onDoTradeResult",@"result":@"DoTradeResult_MCR",@"data":[self convertToJsonData:decodeData]}];
     }else if(result==DoTradeResult_NFC_OFFLINE || result == DoTradeResult_NFC_ONLINE){
-        NSString *formatID = [NSString stringWithFormat:@"Format ID: %@\n",decodeData[@"formatID"]] ;
-        NSString *maskedPAN = [NSString stringWithFormat:@"Masked PAN: %@\n",decodeData[@"maskedPAN"]];
-        NSString *expiryDate = [NSString stringWithFormat:@"Expiry Date: %@\n",decodeData[@"expiryDate"]];
-        NSString *cardHolderName = [NSString stringWithFormat:@"Cardholder Name: %@\n",decodeData[@"cardholderName"]];
-        NSString *serviceCode = [NSString stringWithFormat:@"Service Code: %@\n",decodeData[@"serviceCode"]];
-        NSString *encTrack1 = [NSString stringWithFormat:@"Encrypted Track 1: %@\n",decodeData[@"encTrack1"]];
-        NSString *encTrack2 = [NSString stringWithFormat:@"Encrypted Track 2: %@\n",decodeData[@"encTrack2"]];
-        NSString *encTrack3 = [NSString stringWithFormat:@"Encrypted Track 3: %@\n",decodeData[@"encTrack3"]];
-        NSString *pinKsn = [NSString stringWithFormat:@"PIN KSN: %@\n",decodeData[@"pinKsn"]];
-        NSString *trackksn = [NSString stringWithFormat:@"Track KSN: %@\n",decodeData[@"trackksn"]];
-        NSString *pinBlock = [NSString stringWithFormat:@"pinBlock: %@\n",decodeData[@"pinblock"]];
-        NSString *encPAN = [NSString stringWithFormat:@"encPAN: %@\n",decodeData[@"encPAN"]];
-        NSString *msg = [NSString stringWithFormat:@"Tap Card:\n"];
-        msg = [msg stringByAppendingString:formatID];
-        msg = [msg stringByAppendingString:maskedPAN];
-        msg = [msg stringByAppendingString:expiryDate];
-        msg = [msg stringByAppendingString:cardHolderName];
-        msg = [msg stringByAppendingString:pinKsn];
-        msg = [msg stringByAppendingString:trackksn];
-        msg = [msg stringByAppendingString:serviceCode];
-        msg = [msg stringByAppendingString:encTrack1];
-        msg = [msg stringByAppendingString:encTrack2];
-        msg = [msg stringByAppendingString:encTrack3];
-        msg = [msg stringByAppendingString:pinBlock];
-        msg = [msg stringByAppendingString:encPAN];
         NSString *str = @"";
         if(result == DoTradeResult_NFC_ONLINE){
-            str = @"NFC_ONLINE";
+            str = @"DoTradeResult_NFC_ONLINE";
         }else if(result == DoTradeResult_NFC_OFFLINE){
-            str = @"NFC_OFFLINE";
+            str = @"DoTradeResult_NFC_OFFLINE";
         }
-        [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onDoTradeResult",@"result":[NSString stringWithFormat:@"%@||%@",str,msg]}];
-//        dispatch_async(dispatch_get_main_queue(),  ^{
-//            NSDictionary *mDic = [self.pos getNFCBatchData];
-//            NSString *tlv;
-//            if(mDic !=nil){
-//                tlv= [NSString stringWithFormat:@"NFCBatchData: %@\n",mDic[@"tlv"]];
-//                NSLog(@"--------nfc:tlv%@",tlv);
-//            }else{
-//                tlv = @"";
-//            }
-//        });
+      [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onDoTradeResult",@"result":str,@"data":[self convertToJsonData:decodeData]}];
     }else if(result==DoTradeResult_NFC_DECLINED){
 //        NSLog(@"Tap Card Declined");
-      [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onDoTradeResult",@"result":@"Tap Card Declined"}];
+      [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onDoTradeResult",@"result":@"DoTradeResult_NFC_DECLINED",@"data":@"Tap Card Declined"}];
     }else if (result==DoTradeResult_NO_RESPONSE){
 //        NSLog(@"Check card no response");
-      [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onDoTradeResult",@"result":@"Check card no response"}];
+      [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onDoTradeResult",@"result":@"DoTradeResult_NO_RESPONSE",@"data":@"Check card no response"}];
     }else if(result==DoTradeResult_BAD_SWIPE){
 //        NSLog(@"Bad Swipe. \nPlease swipe again and press check card.");
-      [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onDoTradeResult",@"result":@"Bad Swipe. \nPlease swipe again and press check card."}];
+      [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onDoTradeResult",@"result":@"DoTradeResult_BAD_SWIPE",@"data":@"Bad Swipe.\nPlease swipe again and press check card."}];
     }else if(result==DoTradeResult_NO_UPDATE_WORK_KEY){
 //        NSLog(@"device not update work key");
-      [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onDoTradeResult",@"result":@"device not update work key"}];
+      [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onDoTradeResult",@"result":@"DoTradeResult_NO_UPDATE_WORK_KEY",@"data":@"device not update work key"}];
     }else if(result==DoTradeResult_CARD_NOT_SUPPORT){
 //        NSLog(@"card not support");
-      [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onDoTradeResult",@"result":@"card not support"}];
+      [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onDoTradeResult",@"result":@"DoTradeResult_CARD_NOT_SUPPORT",@"data":@"card not support"}];
     }else if(result==DoTradeResult_PLS_SEE_PHONE){
 //        NSLog(@"pls see phone");
-      [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onDoTradeResult",@"result":@"pls see phone"}];
+      [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onDoTradeResult",@"result":@"DoTradeResult_PLS_SEE_PHONE",@"data":@"pls see phone"}];
     }else if(result==DoTradeResult_TRY_ANOTHER_INTERFACE){
 //        NSLog(@"pls try another interface");
-      [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onDoTradeResult",@"result":@"pls try another interface"}];
+      [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onDoTradeResult",@"result":@"DoTradeResult_TRY_ANOTHER_INTERFACE",@"data":@"pls try another interface"}];
+    }else{
+      [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onDoTradeResult",@"result":[NSString stringWithFormat: @"Not Implemented %ld",(long)result],@"data":@""}];
     }
 }
 
 //send current transaction time to pos
 -(void) onRequestTime{
-    NSString *formatStringForHours = [NSDateFormatter dateFormatFromTemplate:@"j" options:0 locale:[NSLocale currentLocale]];
-    NSRange containA = [formatStringForHours rangeOfString:@"a"];
-    BOOL hasAMPM = containA.location != NSNotFound;
-    NSString *terminalTime = @"";
-//    when phone time is 12h format, need add this judgement.
-    if (hasAMPM) {
-        NSDateFormatter *dateFormatter = [NSDateFormatter new];
-        [dateFormatter setDateFormat:@"yyyyMMddhhmmss"];
-        terminalTime = [dateFormatter stringFromDate:[NSDate date]];
-    }else{
-        NSDateFormatter *dateFormatter = [NSDateFormatter new];
-        [dateFormatter setDateFormat:@"yyyyMMddHHmmss"];
-        terminalTime = [dateFormatter stringFromDate:[NSDate date]];
-    }
-    [self.pos sendTime:terminalTime];
+  [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onRequestTime",@"result":@"",@"data":@""}];
 }
 
 //Prompt message
 -(void) onRequestDisplay: (Display)displayMsg{
-    NSString *msg = @"";
+    NSString *result = @"";
     if (displayMsg==Display_CLEAR_DISPLAY_MSG) {
-        msg = @"";
+      result = @"Display_CLEAR_DISPLAY_MSG";
     }else if(displayMsg==Display_PLEASE_WAIT){
-        msg = @"Please wait...";
+      result = @"Display_PLEASE_WAIT";
     }else if(displayMsg==Display_REMOVE_CARD){
-        msg = @"Please remove card";
+      result = @"Display_REMOVE_CARD";
     }else if (displayMsg==Display_TRY_ANOTHER_INTERFACE){
-        msg = @"Please try another interface";
+      result = @"Display_TRY_ANOTHER_INTERFACE";
     }else if (displayMsg == Display_TRANSACTION_TERMINATED){
-        msg = @"Terminated";
+      result = @"Display_TRANSACTION_TERMINATED";
     }else if (displayMsg == Display_PIN_OK){
-        msg = @"Pin ok";
+      result = @"Display_PIN_OK";
     }else if (displayMsg == Display_INPUT_PIN_ING){
-        msg = @"please input pin on pos";
+      result = @"Display_INPUT_PIN_ING";
     }else if (displayMsg == Display_MAG_TO_ICC_TRADE){
-        msg = @"please insert chip card on pos";
+      result = @"Display_MAG_TO_ICC_TRADE";
     }else if (displayMsg == Display_INPUT_OFFLINE_PIN_ONLY){
-        msg = @"please input offline pin only";
+      result = @"Display_INPUT_OFFLINE_PIN_ONLY";
     }else if(displayMsg == Display_CARD_REMOVED){
-        msg = @"Card Removed";
+      result = @"Display_CARD_REMOVED";
     }else if (displayMsg == Display_INPUT_LAST_OFFLINE_PIN){
-        msg = @"please input last offline pin";
+      result = @"Display_INPUT_LAST_OFFLINE_PIN";
     }else if (displayMsg == Display_PROCESSING){
-        msg = @"processing";
+      result = @"Display_PROCESSING";
+    }else{
+      result = [NSString stringWithFormat: @"Not Implemented %ld",(long)displayMsg];
     }
-    [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onRequestDisplay",@"result":msg}];
-//    NSLog(@"onRequestDisplay: %@",msg);
+  [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onRequestDisplay",@"result":result,@"data":@""}];
 }
 
 //Multiple AIDS select
 -(void) onRequestSelectEmvApp: (NSArray*)appList{
     //NSLog(@"onRequestSelectEmvApp: %@",appList);
-  [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onRequestSelectEmvApp",@"result":@""}];
+  [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onRequestSelectEmvApp",@"result":@"",@"data":[self arrayToJsonString:appList]}];
 }
 
 //return chip card tlv data on this function
 -(void) onRequestOnlineProcess: (NSString*) tlv{
 //    NSLog(@"onRequestOnlineProcess = %@",[[QPOSService sharedInstance] anlysEmvIccData:tlv]);
-  [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onRequestOnlineProcess",@"result":tlv}];
+  [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onRequestOnlineProcess",@"result":@"",@"data":tlv}];
 }
 
 // transaction result callback function
 -(void) onRequestTransactionResult: (TransactionResult)transactionResult{
+  /*
+   TransactionResult_APPROVED,
+   TransactionResult_TERMINATED,
+   TransactionResult_DECLINED,
+   TransactionResult_CANCEL,
+   TransactionResult_CAPK_FAIL,
+   TransactionResult_NOT_ICC,
+   TransactionResult_SELECT_APP_FAIL,
+   TransactionResult_DEVICE_ERROR,
+   TransactionResult_CARD_NOT_SUPPORTED,
+   TransactionResult_MISSING_MANDATORY_DATA,
+   TransactionResult_CARD_BLOCKED_OR_NO_EMV_APPS,
+   TransactionResult_INVALID_ICC_DATA,
+   TransactionResult_FALLBACK,
+   TransactionResult_NFC_TERMINATED,
+   TransactionResult_TRADE_LOG_FULL,
+   TransactionResult_CONTACTLESS_TRANSACTION_NOT_ALLOW,
+   TransactionResult_CARD_BLOCKED,
+   TransactionResult_TOKEN_INVALID,
+   TransactionResult_APP_BLOCKED,
+   TransactionResult_MULTIPLE_CARDS,
+   */
     NSString *messageTextView = @"";
     if (transactionResult==TransactionResult_APPROVED) {
-        messageTextView = @"Approved";
+        messageTextView = @"TransactionResult_APPROVED";
     }else if(transactionResult == TransactionResult_TERMINATED) {
-        messageTextView = @"Terminated";
+        messageTextView = @"TransactionResult_TERMINATED";
     } else if(transactionResult == TransactionResult_DECLINED) {
-        messageTextView = @"Declined";
+        messageTextView = @"TransactionResult_DECLINED";
     } else if(transactionResult == TransactionResult_CANCEL) {
-        messageTextView = @"Cancel";
+        messageTextView = @"TransactionResult_CANCEL";
     } else if(transactionResult == TransactionResult_CAPK_FAIL) {
-        messageTextView = @"Fail (CAPK fail)";
+        messageTextView = @"TransactionResult_CAPK_FAIL";
     } else if(transactionResult == TransactionResult_NOT_ICC) {
-        messageTextView = @"Fail (Not ICC card)";
+        messageTextView = @"TransactionResult_NOT_ICC";
     } else if(transactionResult == TransactionResult_SELECT_APP_FAIL) {
-        messageTextView = @"Fail (App fail)";
+        messageTextView = @"TransactionResult_SELECT_APP_FAIL";
     } else if(transactionResult == TransactionResult_DEVICE_ERROR) {
-        messageTextView = @"Pos Error";
+        messageTextView = @"TransactionResult_DEVICE_ERROR";
     } else if(transactionResult == TransactionResult_CARD_NOT_SUPPORTED) {
-        messageTextView = @"Card not support";
+        messageTextView = @"TransactionResult_CARD_NOT_SUPPORTED";
     } else if(transactionResult == TransactionResult_MISSING_MANDATORY_DATA) {
-        messageTextView = @"Missing mandatory data";
+        messageTextView = @"TransactionResult_MISSING_MANDATORY_DATA";
     } else if(transactionResult == TransactionResult_CARD_BLOCKED_OR_NO_EMV_APPS) {
-        messageTextView = @"Card blocked or no EMV apps";
+        messageTextView = @"TransactionResult_CARD_BLOCKED_OR_NO_EMV_APPS";
     } else if(transactionResult == TransactionResult_INVALID_ICC_DATA) {
-        messageTextView = @"Invalid ICC data";
-    }else if(transactionResult == TransactionResult_NFC_TERMINATED) {
-        messageTextView = @"NFC Terminated";
-    }else if(transactionResult == TransactionResult_CONTACTLESS_TRANSACTION_NOT_ALLOW) {
-        messageTextView = @"TRANS NOT ALLOW";
-    }else if(transactionResult == TransactionResult_CARD_BLOCKED) {
-        messageTextView = @"Card Blocked";
-    }else if(transactionResult == TransactionResult_TOKEN_INVALID) {
-        messageTextView = @"Token Invalid";
-    }else if(transactionResult == TransactionResult_APP_BLOCKED) {
-        messageTextView = @"APP Blocked";
-    }else if(transactionResult == TransactionResult_MULTIPLE_CARDS) {
-        messageTextView = @"Multiple Cards";
+        messageTextView = @"TransactionResult_INVALID_ICC_DATA";
+    } else if(transactionResult == TransactionResult_FALLBACK) {
+      messageTextView = @"TransactionResult_FALLBACK";
+    } else if(transactionResult == TransactionResult_NFC_TERMINATED) {
+        messageTextView = @"TransactionResult_NFC_TERMINATED";
+    } else if(transactionResult == TransactionResult_TRADE_LOG_FULL) {
+      messageTextView = @"TransactionResult_TRADE_LOG_FULL";
+    } else if(transactionResult == TransactionResult_CONTACTLESS_TRANSACTION_NOT_ALLOW) {
+        messageTextView = @"TransactionResult_CONTACTLESS_TRANSACTION_NOT_ALLOW";
+    } else if(transactionResult == TransactionResult_CARD_BLOCKED) {
+        messageTextView = @"TransactionResult_CARD_BLOCKED";
+    } else if(transactionResult == TransactionResult_TOKEN_INVALID) {
+        messageTextView = @"TransactionResult_TOKEN_INVALID";
+    } else if(transactionResult == TransactionResult_APP_BLOCKED) {
+        messageTextView = @"TransactionResult_APP_BLOCKED";
+    } else if(transactionResult == TransactionResult_MULTIPLE_CARDS) {
+        messageTextView = @"TransactionResult_MULTIPLE_CARDS";
+    }else{
+      messageTextView = [NSString stringWithFormat: @"Not Implemented %ld",(long)transactionResult];
     }
 //    NSLog(@"onRequestTransactionResult: %@",messageTextView);
-    [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onRequestTransactionResult",@"result":messageTextView}];
+  [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onRequestTransactionResult",@"result":messageTextView,@"data":@""}];
 }
 
 //return transaction batch data
 -(void) onRequestBatchData: (NSString*)tlv{
 //    tlv = [@"batch data:\n" stringByAppendingString:tlv];
 //    NSLog(@"onBatchData %@",tlv);
-  [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onRequestBatchData",@"result":tlv}];
+  [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onRequestBatchData",@"result":@"",@"data":tlv}];
 }
 
 //return transaction reversal data
 -(void) onReturnReversalData: (NSString*)tlv{
 //    tlv = [@"reversal data:\n" stringByAppendingString:tlv];
 //    NSLog(@"onReversalData %@",tlv);
-  [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onReturnReversalData",@"result":tlv}];
+  [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onReturnReversalData",@"result":@"",@"data":tlv}];
 }
 
 -(void) onEmvICCExceptionData: (NSString*)tlv{
 //    NSLog(@"onEmvICCExceptionData:%@",tlv);
-  [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onEmvICCExceptionData",@"result":tlv}];
+  [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onEmvICCExceptionData",@"result":@"",@"data":tlv}];
 }
 
 //Prompt error message in this function
 -(void) onDHError: (DHError)errorState{
     NSString *msg = @"";
     if(errorState ==DHError_TIMEOUT) {
-        msg = @"Pos no response";
+        msg = @"DHError_TIMEOUT";
     } else if(errorState == DHError_DEVICE_RESET) {
-        msg = @"Pos reset";
+        msg = @"DHError_DEVICE_RESET";
     } else if(errorState == DHError_UNKNOWN) {
-        msg = @"Unknown error";
+        msg = @"DHError_UNKNOWN";
     } else if(errorState == DHError_DEVICE_BUSY) {
-        msg = @"Pos Busy";
+        msg = @"DHError_DEVICE_BUSY";
     } else if(errorState == DHError_INPUT_OUT_OF_RANGE) {
-        msg = @"Input out of range.";
+        msg = @"DHError_INPUT_OUT_OF_RANGE";
     } else if(errorState == DHError_INPUT_INVALID_FORMAT) {
-        msg = @"Input invalid format.";
+        msg = @"DHError_INPUT_INVALID_FORMAT";
     } else if(errorState == DHError_INPUT_ZERO_VALUES) {
-        msg = @"Input are zero values.";
+        msg = @"DHError_INPUT_ZERO_VALUES";
     } else if(errorState == DHError_INPUT_INVALID) {
-        msg = @"Input invalid.";
+        msg = @"DHError_INPUT_INVALID";
     } else if(errorState == DHError_CASHBACK_NOT_SUPPORTED) {
-        msg = @"Cashback not supported.";
+        msg = @"DHError_CASHBACK_NOT_SUPPORTED";
     } else if(errorState == DHError_CRC_ERROR) {
-        msg = @"CRC Error.";
+        msg = @"DHError_CRC_ERROR";
     } else if(errorState == DHError_COMM_ERROR) {
-        msg = @"Communication Error.";
+        msg = @"DHError_COMM_ERROR";
     }else if(errorState == DHError_MAC_ERROR){
-        msg = @"MAC Error.";
+        msg = @"DHError_MAC_ERROR";
     }else if(errorState == DHError_CMD_TIMEOUT){
-        msg = @"CMD Timeout.";
+        msg = @"DHError_CMD_TIMEOUT";
     }else if(errorState == DHError_AMOUNT_OUT_OF_LIMIT){
-        msg = @"Amount out of limit.";
+        msg = @"DHError_AMOUNT_OUT_OF_LIMIT";
     }else if(errorState == DHError_CMD_NOT_AVAILABLE){
-        msg = @"command not available";
+        msg = @"DHError_CMD_NOT_AVAILABLE";
+    }else{
+        msg = [NSString stringWithFormat: @"Not Implemented %ld",(long)errorState];
     }
-//    NSLog(@"onError = %@",msg);
-    [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onDHError",@"result":msg}];
+  [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onDHError",@"result":msg,@"data":@""}];
 }
 
 -(void) onQposIdResult: (NSDictionary*)posId{
-    NSString *aStr = [@"posId:" stringByAppendingString:posId[@"posId"]];
-
-    NSString *temp = [@"psamId:" stringByAppendingString:posId[@"psamId"]];
-    aStr = [aStr stringByAppendingString:@"\n"];
-    aStr = [aStr stringByAppendingString:temp];
-    
-    temp = [@"merchantId:" stringByAppendingString:posId[@"merchantId"]];
-    aStr = [aStr stringByAppendingString:@"\n"];
-    aStr = [aStr stringByAppendingString:temp];
-    
-    temp = [@"vendorCode:" stringByAppendingString:posId[@"vendorCode"]];
-    aStr = [aStr stringByAppendingString:@"\n"];
-    aStr = [aStr stringByAppendingString:temp];
-    
-    temp = [@"deviceNumber:" stringByAppendingString:posId[@"deviceNumber"]];
-    aStr = [aStr stringByAppendingString:@"\n"];
-    aStr = [aStr stringByAppendingString:temp];
-    
-    temp = [@"psamNo:" stringByAppendingString:posId[@"psamNo"]];
-    aStr = [aStr stringByAppendingString:@"\n"];
-    aStr = [aStr stringByAppendingString:temp];
-    
-    [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onQposIdResult",@"result":aStr}];
+    [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onQposIdResult",@"result":@"",@"data":[self convertToJsonData:posId]}];
 }
 
 -(void) onQposInfoResult: (NSDictionary*)posInfoData{
-    NSString *aStr = @"ModelInfo: ";
-    aStr = [aStr stringByAppendingString:posInfoData[@"ModelInfo"]];
-    
-    aStr = [aStr stringByAppendingString:@"\n"];
-    aStr = [aStr stringByAppendingString:@"PCIHardwareVersion: "];
-    aStr = [aStr stringByAppendingString:posInfoData[@"PCIHardwareVersion"]];
-    
-    aStr = [aStr stringByAppendingString:@"\n"];
-    aStr = [aStr stringByAppendingString:@"SUB: "];
-    aStr = [aStr stringByAppendingString:posInfoData[@"SUB"]];
-    
-    aStr = [aStr stringByAppendingString:@"\n"];
-    aStr = [aStr stringByAppendingString:@"bootloaderVersion: "];
-    aStr = [aStr stringByAppendingString:posInfoData[@"bootloaderVersion"]];
-    
-    aStr = [aStr stringByAppendingString:@"\n"];
-    aStr = [aStr stringByAppendingString:@"Firmware Version: "];
-    aStr = [aStr stringByAppendingString:posInfoData[@"firmwareVersion"]];
-    
-    aStr = [aStr stringByAppendingString:@"\n"];
-    aStr = [aStr stringByAppendingString:@"Hardware Version: "];
-    aStr = [aStr stringByAppendingString:posInfoData[@"hardwareVersion"]];
-    
-    NSString *batteryPercentage = posInfoData[@"batteryPercentage"];
-    if (batteryPercentage==nil || [@"" isEqualToString:batteryPercentage]) {
-        aStr = [aStr stringByAppendingString:@"\n"];
-        aStr = [aStr stringByAppendingString:@"Battery Level: "];
-        aStr = [aStr stringByAppendingString:posInfoData[@"batteryLevel"]];
-    }else{
-        aStr = [aStr stringByAppendingString:@"\n"];
-        aStr = [aStr stringByAppendingString:@"Battery Percentage: "];
-        aStr = [aStr stringByAppendingString:posInfoData[@"batteryPercentage"]];
-    }
-    aStr = [aStr stringByAppendingString:@"\n"];
-    aStr = [aStr stringByAppendingString:@"Charge: "];
-    aStr = [aStr stringByAppendingString:posInfoData[@"isCharging"]];
-    
-    aStr = [aStr stringByAppendingString:@"\n"];
-    aStr = [aStr stringByAppendingString:@"USB: "];
-    aStr = [aStr stringByAppendingString:posInfoData[@"isUsbConnected"]];
-    
-    aStr = [aStr stringByAppendingString:@"\n"];
-    aStr = [aStr stringByAppendingString:@"Track 1 Supported: "];
-    aStr = [aStr stringByAppendingString:posInfoData[@"isSupportedTrack1"]];
-    
-    aStr = [aStr stringByAppendingString:@"\n"];
-    aStr = [aStr stringByAppendingString:@"Track 2 Supported: "];
-    aStr = [aStr stringByAppendingString:posInfoData[@"isSupportedTrack2"]];
-    aStr = [aStr stringByAppendingString:@"\n"];
-    aStr = [aStr stringByAppendingString:@"Track 3 Supported: "];
-    aStr = [aStr stringByAppendingString:posInfoData[@"isSupportedTrack3"]];
-    aStr = [aStr stringByAppendingString:@"\n"];
-    aStr = [aStr stringByAppendingString:@"updateWorkKeyFlag: "];
-    aStr = [aStr stringByAppendingString:posInfoData[@"updateWorkKeyFlag"]];
-    [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onQposInfoResult",@"result":aStr}];
+  [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onQposInfoResult",@"result":@"",@"data":[self convertToJsonData:posInfoData]}];
 }
 
 -(void)onReturnSetMasterKeyResult: (BOOL)isSuccess{
-   [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onReturnSetMasterKeyResult",@"result":@(isSuccess)}];
+  NSString *result = isSuccess? @"success":@"fail";
+  [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onReturnSetMasterKeyResult",@"result":result,@"data":@""}];
 }
 
 -(void)onRequestUpdateWorkKeyResult:(UpdateInformationResult)updateInformationResult{
     NSString *updateResult = @"";
     if (updateInformationResult==UpdateInformationResult_UPDATE_SUCCESS) {
-        updateResult = @"Success";
+        updateResult = @"UpdateInformationResult_UPDATE_SUCCESS";
     }else if(updateInformationResult==UpdateInformationResult_UPDATE_FAIL){
-        updateResult = @"Failed";
+        updateResult = @"UpdateInformationResult_UPDATE_FAIL";
     }else if(updateInformationResult==UpdateInformationResult_UPDATE_PACKET_LEN_ERROR){
-        updateResult = @"Packet len error";
+        updateResult = @"UpdateInformationResult_UPDATE_PACKET_LEN_ERROR";
     }else if(updateInformationResult==UpdateInformationResult_UPDATE_PACKET_VEFIRY_ERROR){
-        updateResult = @"Packer vefiry error";
+        updateResult = @"UpdateInformationResult_UPDATE_PACKET_VEFIRY_ERROR";
     }
-    [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onRequestUpdateWorkKeyResult",@"result":updateResult}];
+  [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onRequestUpdateWorkKeyResult",@"result":updateResult,@"data":@""}];
 }
+
+- (void)onTradeCancelled{
+  [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onTradeCancelled",@"result":@"success",@"data":@""}];
+}
+
 
 // callback function of updateEmvConfig and updateEMVConfigByXml api.
 -(void)onReturnCustomConfigResult:(BOOL)isSuccess config:(NSString*)resutl{
-  [self sendEventWithName:@"NativePosReminder" body:@{@"key":@"onReturnCustomConfigResult",@"result":@(isSuccess)}];
+  NSString *result = isSuccess? @"success":@"fail";
+  [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onReturnCustomConfigResult",@"result":result,@"data":resutl}];
 }
 
 - (NSString *)convertToJsonData:(NSDictionary *)dict{
@@ -605,6 +504,12 @@ RCT_EXPORT_METHOD(updateEMVConfigByXml:(NSString *)xmlStr){
     //去掉字符串中的换行符
     [mutStr replaceOccurrencesOfString:@"\n" withString:@"" options:NSLiteralSearch range:range2];
     return mutStr;
+}
+
+- (NSString *)arrayToJsonString:(NSArray *)array{
+    NSError *error = nil;
+    NSData *jsonData = [NSJSONSerialization dataWithJSONObject:array options:NSJSONWritingPrettyPrinted error:&error];
+    return [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];;
 }
 
 -(void)sleepMs: (NSInteger)msec {

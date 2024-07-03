@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {AppRegistry, Text, TextInput, View, EventEmitter,NativeEventEmitter,NativeModules,Button, StyleSheet,DeviceEventEmitter,FlatList, TouchableOpacity, string, ScrollView, Title, Alert, prompt} from 'react-native';
+import { Text, TextInput, View, NativeEventEmitter,NativeModules,Button, StyleSheet,DeviceEventEmitter,FlatList, TouchableOpacity, string, ScrollView, Title, Alert, prompt} from 'react-native';
 var pos = NativeModules.NativePosModule;
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 const NativePosEmitter = new NativeEventEmitter(pos);
@@ -7,88 +7,101 @@ const NativePosEmitter = new NativeEventEmitter(pos);
 /**
      * Transaction type.
      */
-const TransactionType = [
-  'GOODS', // 货物 GOODS
-  'SERVICES', // 服务 service
-  'CASH', // 现金 cash
-  'CASHBACK', //  返现
-  'INQUIRY', // 查询
-  'TRANSFER', // 转账
-  'ADMIN', // 管理
-  'CASHDEPOSIT', // 存款
-  'PAYMENT', // 付款 支付
+export const MPosTransactionType = {
+    TransactionType_GOODS : 0, // 货物
+    TransactionType_SERVICES : 1, // 服务
+    TransactionType_CASH : 2,//现金
+    TransactionType_CASHBACK : 3, // 退货 返现
+    TransactionType_INQUIRY : 4, // 查询
+    TransactionType_TRANSFER : 5, // 转账
+    TransactionType_ADMIN : 6,//管理
+    TransactionType_CASHDEPOSIT : 7,//存款
+    TransactionType_PAYMENT : 8,// 付款 支付
+    TransactionType_PBOCLOG : 9,//        0x0A            /*PBOC日志(电子现金日志)*/
+    TransactionType_SALE : 10,//           0x0B            /*消费*/
+    TransactionType_PREAUTH : 11,//        0x0C            /*预授权*/
+    TransactionType_ECQ_DESIGNATED_LOAD : 12,//        0x10
+    TransactionType_ECQ_UNDESIGNATED_LOAD : 13,//    0x11
+    TransactionType_ECQ_CASH_LOAD : 14,//    0x12    /*电子现金费现金圈存*/
+    TransactionType_ECQ_CASH_LOAD_VOID : 15,//            0x13
+    TransactionType_ECQ_INQUIRE_LOG : 16,//    0x0A    /*电子现金日志(和PBOC日志一样)*/
+    TransactionType_REFUND : 17,
+    TransactionType_UPDATE_PIN : 18,
+}
 
-  'PBOCLOG', // 0x0A /*PBOC日志(电子现金日志)*/
-  'SALES_NEW', // 0x0B /*消费*/
-  'PREAUTH', // 0x0C /*预授权*/
+const EmvOption = {
+    EmvOption_START : 0,
+    EmvOption_START_WITH_FORCE_ONLINE : 1,
+    EmvOption_START_WITH_FORCE_PIN : 2,
+    EmvOption_START_WITH_FORCE_ONLINE_FORCE_PIN : 3,
+}
 
-  'ECQ_DESIGNATED_LOAD', // 0x10 /*电子现金Q指定账户圈存*/
-  'ECQ_UNDESIGNATED_LOAD', // 0x11 /*电子现金费非指定账户圈存*/
-  'ECQ_CASH_LOAD', // 0x12 /*电子现金费现金圈存*/
-  'ECQ_CASH_LOAD_VOID', // 0x13 /*电子现金圈存撤销*/
-  'ECQ_INQUIRE_LOG', // 0x0A /*电子现金日志(和PBOC日志一样)*/
-  'REFUND',//退款
-  'UPDATE_PIN',     //修改密码
-  'SALES_NEW',
-  'NON_LEGACY_MONEY_ADD', /* 0x17*/
-  'LEGACY_MONEY_ADD',  /*0x16*/
-  'BALANCE_UPDATE', /*0x18*/
-];
-const communicationMode = [
-  'BLUETOOTH',
-  'BLUETOOTH_BLE',
-  'UART',
-  'USB_OTG_CDC_ACM',
-  'AUDIO',
-   ];
+const EncryptType = {
+  EncryptType_plaintext : 0,
+  EncryptType_encrypted : 1,
+}
 
+const CHECKVALUE_KEYTYPE = {
+   MKSK_TMK : 0,
+   MKSK_PIK : 1,
+   MKSK_TDK : 2,
+   MKSK_MCK : 3,
+   TCK : 4,
+   MAGK : 5,
+   DUKPT_TRK_IPEK : 6,
+   DUKPT_EMV_IPEK : 7,
+   DUKPT_PIN_IPEK : 8,
+   DUKPT_TRK_KSN : 9,
+   DUKPT_EMV_KSN : 10,
+   DUKPT_PIN_KSN : 11,
+   DUKPT_MKSK_ALLTYPE : 12,
+}
 
-var test = NativeModules.NativePosModule;
+const CardTradeMode = {
+    CardTradeMode_ONLY_INSERT_CARD : 0,
+    CardTradeMode_ONLY_SWIPE_CARD : 1,
+    CardTradeMode_SWIPE_INSERT_CARD : 2,
+    CardTradeMode_UNALLOWED_LOW_TRADE : 3,
+    CardTradeMode_SWIPE_TAP_INSERT_CARD : 4,// add 20150715
+    CardTradeMode_SWIPE_TAP_INSERT_CARD_UNALLOWED_LOW_TRADE : 5,
+    CardTradeMode_ONLY_TAP_CARD : 6,
+    CardTradeMode_SWIPE_TAP_INSERT_CARD_NOTUP : 7,
+    CardTradeMode_TAP_INSERT_CARD_NOTUP : 8,//无上翻键
+    CardTradeMode_TAP_INSERT_CARD_TUP : 9,//有上翻键
+    CardTradeMode_SWIPE_TAP_INSERT_CARD_Down : 10,//下翻建
+    CardTradeMode_SWIPE_TAP_INSERT_CARD_NOTUP_UNALLOWED_LOW_TRADE : 11,
+    CardTradeMode_SWIPE_INSERT_CARD_UNALLOWED_LOW_TRADE : 12,
+    CardTradeMode_SWIPE_TAP_INSERT_CARD_UNALLOWED_LOW_TRADE_NEW : 13,
+    CardTradeMode_SWIPE_TAP_INSERT_CARD_NOTUP_DELAY : 14,
+}
+
 export default class catComponent extends Component {
  
   render() {
       return (
             <View style = {this.styles.container}>
-        							
-			{/* <Button title="Start Now!" onPress={this.scanBluetooth2android}/> */}
-				
-        
             <FlatList
             ListHeaderComponent={
-                           
                 <View>
-                   <View style = {this.styles.container}>
-                      {/* <TouchableOpacity onPress={this.initPosBluetooth.bind(this)} style = {this.styles.button}>
-                      <Text style={this.styles.text}>initPos Bluetooth</Text>                                          
-                      </TouchableOpacity>  */}
-                      <TouchableOpacity onPress={this.scanBluetooth.bind(this)} style = {this.styles.button}>
+                    <TouchableOpacity onPress={this.scanBluetooth.bind(this)} style = {this.styles.button}>
                       <Text style={this.styles.text}>Scan Bluetooth</Text>
-                      </TouchableOpacity> 
-                      <TouchableOpacity onPress={this.disconnect} style = {this.styles.button}>
-                      <Text style={this.styles.text}>Disconnect</Text>
-                    </TouchableOpacity>    
-                   </View>
-                     <View style = {this.styles.container}>
-                     <TouchableOpacity onPress={this.initPosUART.bind(this)} style = {this.styles.button}>
-                      <Text style={this.styles.text}>Open UART</Text>                                            
                     </TouchableOpacity>  
-                    <TouchableOpacity onPress={this.closeUart} style = {this.styles.button}>
-                      <Text style={this.styles.text}>Close Uart</Text>
-                    </TouchableOpacity>                 
-                    </View>
-                   
-                    <TouchableOpacity onPress={this.doTrade} style = {this.styles.buttons}>
-                      <Text style={this.styles.text}>DoTrade</Text>
+                    <TouchableOpacity onPress={this.doTrade} style = {this.styles.button}>
+                      <Text style={this.styles.text}>doTrade</Text>
                     </TouchableOpacity>  
-                    <View style = {this.styles.container}>
+                    <TouchableOpacity onPress={this.disconnect} style = {this.styles.button}>
+                      <Text style={this.styles.text}>disconnect</Text>
+                    </TouchableOpacity>
                     <TouchableOpacity onPress={this.getQposId} style = {this.styles.button}>
-                      <Text style={this.styles.text}>GetQposId</Text>
+                      <Text style={this.styles.text}>getQposId</Text>
                     </TouchableOpacity> 
                     <TouchableOpacity onPress={this.getQposInfo} style = {this.styles.button}>
-                      <Text style={this.styles.text}>GetQposInfo</Text>
-                    </TouchableOpacity>   
-                    </View>
-                    {/* <Text style = {this.styles.textStyle}>Bluetooth Name</Text>         */}
+                      <Text style={this.styles.text}>getQposInfo</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={this.resetPosStatus} style = {this.styles.button}>
+                      <Text style={this.styles.text}>resetPosStatus</Text>
+                    </TouchableOpacity>
+                    <Text style = {this.styles.textStyle}>Bluetooth Name</Text>        
                  </View>
                 }
                 
@@ -107,12 +120,6 @@ export default class catComponent extends Component {
       )
   }
 
-
-
-scanBluetooth2android(){
-		//test.jump();
-		test.jump
-	}
   constructor() {
     super()
     this.state = ({
@@ -133,14 +140,12 @@ scanBluetooth2android(){
       transactionData: "",
      });
   }
-// 获取数据列表
 
   onScanningResult(msg){  
-   
-    var message = msg.key + "\n" + msg.result;
+    var message = "method: " + msg.method + " result: " + msg.result + " data: " + msg.data;
     console.log("js",message);
 
-    if(msg.key == "onBluetoothName2Mode"){
+    if(msg.method == "onBluetoothName2Mode"){
       blueName = msg.result;
       var pages = this.state.bluetoothName;
       pages.push(
@@ -149,145 +154,132 @@ scanBluetooth2android(){
      
       this.setState({
            bluetoothName : pages
-          
       });
-    }else if(msg.key == "onRequestQposConnected"){
-      this.setState({
-           bluetoothName: [],
-          transactionData: "",
-    
-          transactionData : message
-      });
-
-    }else if(msg.key == "onRequestQposDisconnected"){
+    }else if(msg.method == "onRequestQposConnected"){
       this.setState({
         transactionData : message
       });
 
-    }else if(msg.key == "onRequestNoQposDetected"){
+    }else if(msg.method == "onRequestQposDisconnected"){
       this.setState({
         transactionData : message
       });
 
-    }else if(msg.key == "onQposIdResult"){
+    }else if(msg.method == "onRequestNoQposDetected"){
       this.setState({
         transactionData : message
       });
 
-    }else if(msg.key == "onQposInfoResult"){
+    }else if(msg.method == "onQposIdResult"){
       this.setState({
         transactionData : message
       });
 
-    }else if(msg.key == "onRequestWaitingUser"){
+    }else if(msg.method == "onQposInfoResult"){
       this.setState({
         transactionData : message
       });
 
-    }else if(msg.key == "onRequestSetAmount"){
-      this.setState({
-        transactionData : message
-      });
-      pos.setAmount("123","","0156",TransactionType[0]);
-    }else if(msg.key == "onRequestSetPin"){
-      this.setState({
-        transactionData : message
-      });
-      pos.sendPin("1234") 
-    }else if(msg.key == "onDoTradeResult"){
+    }else if(msg.method == "onRequestWaitingUser"){
       this.setState({
         transactionData : message
       });
 
-    }else if(msg.key == "onRequestDisplay"){
+    }else if(msg.method == "onRequestSetAmount"){
       this.setState({
         transactionData : message
       });
-
-    }else if(msg.key == "onRequestSelectEmvApp"){
+      pos.setAmount("123","","0156",MPosTransactionType.TransactionType_GOODS);
+    }else if(msg.method == "onRequestPinEntry"){
       this.setState({
         transactionData : message
       });
-
-    }else if(msg.key == "onRequestOnlineProcess"){
-      this.setState({
-        transactionData : message
-      });
-      pos.sendOnlineProcessResult("8A023030");
-    }else if(msg.key == "onRequestTransactionResult"){
-      this.setState({
-        transactionData : message
-      });
-
-    }else if(msg.key == "onRequestBatchData"){
-      this.setState({
-        transactionData : message
-      });
-
-    }else if(msg.key == "onReturnReversalData"){
-      this.setState({
-        transactionData : message
-      });
-
-    }else if(msg.key == "onEmvICCExceptionData"){
-      this.setState({
-        transactionData : message
-      });
-
-    }else if(msg.key == "onDHError"){
-      this.setState({
-        transactionData : message
-      });
-
-    }else if(msg.key == "doTrade"){
+      pos.sendPinEntryResult("1234");
+    }else if(msg.method == "onDoTradeResult"){
+      if(msg.result == "DoTradeResult_ICC"){
+         pos.doEmvApp(EmvOption.EmvOption_START);
+      }else if(msg.result == "DoTradeResult_NFC_ONLINE" || msg.result == "DoTradeResult_NFC_OFFLINE"){
         this.setState({
           transactionData : message
-       });
-    }else if(msg.key=="onError"){
+        });
+        let data = pos.getNFCBatchData();
+        console.log("js",data);
+      }else{
+         this.setState({
+           transactionData : message
+         });
+      }
+    }else if(msg.method == "onRequestDisplay"){
       this.setState({
         transactionData : message
-     });
+      });
+    }else if(msg.method == "onRequestTime"){
+      this.setState({
+        transactionData : message
+      });
+      var time = this.formattedDate();
+      console.log("formattedDate: " + time);
+      pos.sendTime(this.formattedDate());
+    }else if(msg.method == "onRequestSelectEmvApp"){
+      this.setState({
+        transactionData : message
+      });
+      pos.selectEmvApp(0);
+    }else if(msg.method == "onRequestOnlineProcess"){
+      this.setState({
+        transactionData : message
+      });
+      //pos.getICCTag(EncryptType_plaintext,0,2,"9F3495");//get 9F34, 95 tag from terminal
+      pos.sendOnlineProcessResult("8A023030");
+    }else if(msg.method == "onRequestTransactionResult"){
+      this.setState({
+        transactionData : message
+      });
 
+    }else if(msg.method == "onRequestBatchData"){
+      this.setState({
+        transactionData : message
+      });
+
+    }else if(msg.method == "onReturnReversalData"){
+      this.setState({
+        transactionData : message
+      });
+
+    }else if(msg.method == "onEmvICCExceptionData"){
+      this.setState({
+        transactionData : message
+      });
+
+    }else if(msg.method == "onDHError"){
+      this.setState({
+        transactionData : message
+      });
     }
-   
    }
    _onPressItem(item) {
-  
+    pos.stopQPos2Mode();
     console.log("connectBluetooth: " + item.key);
     pos.connectBT(item.key);
    }
   /**
    * RN调用Native且通过Callback回调 通信方式
    */
-
-  
-    // initPosBluetooth(msg){
-    //   pos.initPos(communicationMode[0]);
-    // }
-    scanBluetooth(msg) {
+   scanBluetooth(msg) {
       this.setState({
            bluetoothName : []
       });
       console.log("scanBluetooth");
-      pos.initPos(communicationMode[0]);
       pos.scanQPos2Mode(10);
    }
-   initPosUART(msg){
-    pos.initPos(communicationMode[2]);
-  }
-   closeUart(msg){
-     pos.closeUart();
-  }
+
    doTrade(msg) {
       console.log("doTrade");
+      pos.setCardTradeMode(CardTradeMode.CardTradeMode_SWIPE_TAP_INSERT_CARD_NOTUP);
       pos.doTrade(0,20);
    }
 
    disconnect(msg) {
-    this.state = ({
-      bluetoothName: [],
-      transactionData: "",
-  });
       console.log("disconnect");
       pos.disconnectBT();
    }
@@ -301,14 +293,30 @@ scanBluetooth2android(){
       console.log("getQposInfo");
       pos.getQPosInfo();
    }
+    
+   resetPosStatus(msg) {
+      console.log("resetPosStatus");
+      pos.resetPosStatus();
+   }
+
+   formattedDate(){
+    const date = new Date();
+    const year = date.getFullYear();  
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');  
+    const day = date.getDate().toString().padStart(2, '0'); 
+    const hour = date.getHours().toString().padStart(2, '0');
+    const minute = date.getMinutes().toString().padStart(2, '0');
+    const second = date.getSeconds().toString().padStart(2, '0');
+    const formattedDate = year+month+day+hour+minute+second;
+    return formattedDate;  
+  }
 
   styles = StyleSheet.create({
 
    container:{
-       // marginTop : 10,
-      // marginLeft: 10,
-      // marginRight:10,
-      flexDirection: 'row', 
+      marginTop : 10,
+      marginLeft: 10,
+      marginRight:10,
     },
     
     text:{
@@ -324,7 +332,6 @@ scanBluetooth2android(){
 
     textStyle:{
       fontSize : 17,
-      padding:5,
       marginBottom : 10
     },
 
@@ -334,26 +341,12 @@ scanBluetooth2android(){
     },
 
     button:{
-        marginTop:5,
         backgroundColor : "#4CAF50",
         height : 40,
-        marginLeft:10,
-        marginRight:10,
         marginBottom : 10,
-        borderRadius : 8,
-        width:'43%'
-        // width:140
+        borderRadius : 8
     },
-    buttons:{
-      marginTop:5,
-      backgroundColor : "#4CAF50",
-      height : 40,
-      marginLeft:10,
-      marginRight:10,
-      marginBottom : 10,
-      borderRadius : 8,
-      // width:140
-  },
+
     scrollView:{
        marginTop : 10,
        marginBottom : 20
@@ -363,7 +356,6 @@ scanBluetooth2android(){
         padding:10,
         fontSize:18,
         height:44,
-        
     },
   });
 }
