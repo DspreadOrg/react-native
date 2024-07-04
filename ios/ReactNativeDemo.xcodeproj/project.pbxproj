@@ -12,7 +12,7 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		1459DE4A280865690007A72A /* libqpos-ios-release-sdk-v3.3.6.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 1459DE49280865680007A72A /* libqpos-ios-release-sdk-v3.3.6.a */; };
+		145374722C35678900E99C1C /* libqpos-ios-release-sdk-v3.6.8.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 145374712C35678900E99C1C /* libqpos-ios-release-sdk-v3.6.8.a */; };
 		14B972452806AE6500CF3822 /* NativePosModule.m in Sources */ = {isa = PBXBuildFile; fileRef = 14B972442806AE6500CF3822 /* NativePosModule.m */; };
 		7699B88040F8A987B510C191 /* libPods-ReactNativeDemo-ReactNativeDemoTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-ReactNativeDemo-ReactNativeDemoTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
@@ -38,7 +38,7 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = ReactNativeDemo/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = ReactNativeDemo/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = ReactNativeDemo/main.m; sourceTree = "<group>"; };
-		1459DE49280865680007A72A /* libqpos-ios-release-sdk-v3.3.6.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libqpos-ios-release-sdk-v3.3.6.a"; sourceTree = "<group>"; };
+		145374712C35678900E99C1C /* libqpos-ios-release-sdk-v3.6.8.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = "libqpos-ios-release-sdk-v3.6.8.a"; sourceTree = "<group>"; };
 		14B972362806AE1E00CF3822 /* QPOSUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QPOSUtil.h; sourceTree = "<group>"; };
 		14B972382806AE1E00CF3822 /* BTDeviceFinder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BTDeviceFinder.h; sourceTree = "<group>"; };
 		14B9723C2806AE1E00CF3822 /* QPOSService.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = QPOSService.h; sourceTree = "<group>"; };
@@ -67,7 +67,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1459DE4A280865690007A72A /* libqpos-ios-release-sdk-v3.3.6.a in Frameworks */,
+				145374722C35678900E99C1C /* libqpos-ios-release-sdk-v3.6.8.a in Frameworks */,
 				0C80B921A6F3F58F76C31292 /* libPods-ReactNativeDemo.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -109,10 +109,10 @@
 		14B972332806AE1E00CF3822 /* pos-ios-sdk-lib */ = {
 			isa = PBXGroup;
 			children = (
+				145374712C35678900E99C1C /* libqpos-ios-release-sdk-v3.6.8.a */,
 				14B972362806AE1E00CF3822 /* QPOSUtil.h */,
 				14B972382806AE1E00CF3822 /* BTDeviceFinder.h */,
 				14B972432806AE6500CF3822 /* NativePosModule.h */,
-				1459DE49280865680007A72A /* libqpos-ios-release-sdk-v3.3.6.a */,
 				14B972442806AE6500CF3822 /* NativePosModule.m */,
 				14B9723C2806AE1E00CF3822 /* QPOSService.h */,
 			);
@@ -488,7 +488,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example-1.--PRODUCT-NAME-rfc1034identifier-";
 				PRODUCT_NAME = ReactNativeDemo;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -518,7 +518,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example-1.--PRODUCT-NAME-rfc1034identifier-";
 				PRODUCT_NAME = ReactNativeDemo;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";

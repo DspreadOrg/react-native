@@ -101,6 +101,9 @@ export default class catComponent extends Component {
                     <TouchableOpacity onPress={this.resetPosStatus} style = {this.styles.button}>
                       <Text style={this.styles.text}>resetPosStatus</Text>
                     </TouchableOpacity>
+                    <TouchableOpacity onPress={this.updateEMVConfigByXML} style = {this.styles.button}>
+                      <Text style={this.styles.text}>updateEMVConfigByXML</Text>
+                    </TouchableOpacity>
                     <Text style = {this.styles.textStyle}>Bluetooth Name</Text>        
                  </View>
                 }
@@ -298,6 +301,20 @@ export default class catComponent extends Component {
       console.log("resetPosStatus");
       pos.resetPosStatus();
    }
+
+   updateEMVConfigByXML(msg) {
+    console.log("updateEMVConfigByXML");
+  // use fetch to read emv xml content
+    fetch("https://gitlab.com/dspread/android/-/raw/master/pos_android_studio_demo/pos_android_studio_app/src/main/assets/emv_profile_tlv.xml?ref_type=heads")
+    .then(response => response.text())
+    .then(text => {
+      console.log('XML content:', text);
+      pos.updateEMVConfigByXml(text);
+    })
+    .catch(error => {
+      console.error('Error reading XML file:', error);
+    });
+ }
 
    formattedDate(){
     const date = new Date();
