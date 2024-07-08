@@ -42,6 +42,8 @@ import com.reactnativedemo.keyboard.keyboard.MyKeyboardView;
 import com.reactnativedemo.utils.QPOSUtil;
 import com.reactnativedemo.utils.TRACE;
 
+import com.alibaba.fastjson.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -50,8 +52,6 @@ import java.util.Hashtable;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import Decoder.BASE64Encoder;
 
 public class NativePosModule extends ReactContextBaseJavaModule {
     public ReactApplicationContext reactApplicationContext;
@@ -122,11 +122,17 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         Log.w("scanQPos2Mode", "scanQPos2Mode=" + time);
     }
 
+    @ReactMethod
+    public void setCardTradeMode(int cardTradeMode) {
+        Log.w("setCardTradeMode: ", QPOSService.CardTradeMode.values()[cardTradeMode].toString());
+        pos.setCardTradeMode(QPOSService.CardTradeMode.values()[cardTradeMode]);
+    }
+
     private void open(QPOSService.CommunicationMode mode) {
         TRACE.d("open");
         //pos=null;
         listener = new MyQposClass();
-        pos = QPOSService.getInstance(mode);
+        pos = QPOSService.getInstance(context,mode);
         if (pos == null) {
             Log.w("open", "CommunicationMode unknow");
             return;
@@ -134,8 +140,8 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         if (mode == QPOSService.CommunicationMode.USB_OTG_CDC_ACM) {
             pos.setUsbSerialDriver(QPOSService.UsbOTGDriver.CDCACM);
         }
-        pos.setD20Trade(true);
-        pos.setConext(context);
+//        pos.setD20Trade(true);
+//        pos.setConext(context);
         //init handler
         Handler handler = new Handler(Looper.myLooper());
         pos.initListener(handler, listener);
@@ -144,10 +150,19 @@ public class NativePosModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void connectBT(String blueTootchName) {
-        Log.w("connectBluetoothDevice", "connectBluetoothDevice==" + blueTootchName);
         String blueTootchAddress = listener.deviceList.get(blueTootchName);
         Log.w("connectBluetoothDevice", "connectBluetoothDevice=22=" + blueTootchAddress);
         pos.connectBluetoothDevice(true, 25, blueTootchAddress);
+    }
+
+    @ReactMethod
+    public void stopQPos2Mode() {
+        pos.stopScanQPos2Mode();
+    }
+
+    @ReactMethod
+    public void resetPosStatus() {
+        pos.resetQPosStatus();
     }
 
     @ReactMethod
@@ -160,56 +175,58 @@ public class NativePosModule extends ReactContextBaseJavaModule {
     }
     @ReactMethod
     public void doTrade(int keyIdex, int timeOut) {
-        pos.setCardTradeMode(QPOSService.CardTradeMode.SWIPE_TAP_INSERT_CARD_NOTUP);
-        pos.doTrade(keyIdex, 30);
+        pos.doTrade(keyIdex, timeOut);
     }
 
     @ReactMethod
-    public void setAmount(String amount, String cashbackAmount, String currencyCode, String transactionTypeString) {
-        Log.w("setAmount", "goods==" + transactionTypeString);
-        QPOSService.TransactionType transactionType = QPOSService.TransactionType.GOODS;
-        if (transactionTypeString.equals("GOODS")) {
-            transactionType = QPOSService.TransactionType.GOODS;
-        } else if (transactionTypeString.equals("SERVICES")) {
-            transactionType = QPOSService.TransactionType.SERVICES;
-        } else if (transactionTypeString.equals("CASH")) {
-            transactionType = QPOSService.TransactionType.CASH;
-        } else if (transactionTypeString.equals("CASHBACK")) {
-            transactionType = QPOSService.TransactionType.CASHBACK;
-        } else if (transactionTypeString.equals("INQUIRY")) {
-            transactionType = QPOSService.TransactionType.INQUIRY;
-        } else if (transactionTypeString.equals("TRANSFER")) {
-            transactionType = QPOSService.TransactionType.TRANSFER;
-        } else if (transactionTypeString.equals("ADMIN")) {
-            transactionType = QPOSService.TransactionType.ADMIN;
-        } else if (transactionTypeString.equals("CASHDEPOSIT")) {
-            transactionType = QPOSService.TransactionType.CASHDEPOSIT;
-        } else if (transactionTypeString.equals("PAYMENT")) {
-            transactionType = QPOSService.TransactionType.PAYMENT;
-        } else if (transactionTypeString.equals("PBOCLOG||ECQ_INQUIRE_LOG")) {
-            transactionType = QPOSService.TransactionType.PBOCLOG;
-        } else if (transactionTypeString.equals("SALE")) {
-            transactionType = QPOSService.TransactionType.SALE;
-        } else if (transactionTypeString.equals("PREAUTH")) {
-            transactionType = QPOSService.TransactionType.PREAUTH;
-        } else if (transactionTypeString.equals("ECQ_DESIGNATED_LOAD")) {
-            transactionType = QPOSService.TransactionType.ECQ_DESIGNATED_LOAD;
-        } else if (transactionTypeString.equals("ECQ_UNDESIGNATED_LOAD")) {
-            transactionType = QPOSService.TransactionType.ECQ_UNDESIGNATED_LOAD;
-        } else if (transactionTypeString.equals("ECQ_CASH_LOAD")) {
-            transactionType = QPOSService.TransactionType.ECQ_CASH_LOAD;
-        } else if (transactionTypeString.equals("ECQ_CASH_LOAD_VOID")) {
-            transactionType = QPOSService.TransactionType.ECQ_CASH_LOAD_VOID;
-        } else if (transactionTypeString.equals("CHANGE_PIN")) {
-            transactionType = QPOSService.TransactionType.UPDATE_PIN;
-        } else if (transactionTypeString.equals("REFOUND")) {
-            transactionType = QPOSService.TransactionType.REFUND;
-        } else if (transactionTypeString.equals("SALES_NEW")) {
-            transactionType = QPOSService.TransactionType.SALES_NEW;
-        }
+    public void sendTime(String terminalTime) {
+        pos.sendTime(terminalTime);
+    }
 
-        pos.setAmount(amount, cashbackAmount, currencyCode, transactionType);
-
+    @ReactMethod
+    public void setAmount(String amount, String cashbackAmount, String currencyCode,int transactionType) {
+//        Log.w("setAmount", "goods==" + transactionTypeString);
+//        QPOSService.TransactionType transactionType = QPOSService.TransactionType.GOODS;
+//        if (transactionTypeString.equals("GOODS")) {
+//            transactionType = QPOSService.TransactionType.GOODS;
+//        } else if (transactionTypeString.equals("SERVICES")) {
+//            transactionType = QPOSService.TransactionType.SERVICES;
+//        } else if (transactionTypeString.equals("CASH")) {
+//            transactionType = QPOSService.TransactionType.CASH;
+//        } else if (transactionTypeString.equals("CASHBACK")) {
+//            transactionType = QPOSService.TransactionType.CASHBACK;
+//        } else if (transactionTypeString.equals("INQUIRY")) {
+//            transactionType = QPOSService.TransactionType.INQUIRY;
+//        } else if (transactionTypeString.equals("TRANSFER")) {
+//            transactionType = QPOSService.TransactionType.TRANSFER;
+//        } else if (transactionTypeString.equals("ADMIN")) {
+//            transactionType = QPOSService.TransactionType.ADMIN;
+//        } else if (transactionTypeString.equals("CASHDEPOSIT")) {
+//            transactionType = QPOSService.TransactionType.CASHDEPOSIT;
+//        } else if (transactionTypeString.equals("PAYMENT")) {
+//            transactionType = QPOSService.TransactionType.PAYMENT;
+//        } else if (transactionTypeString.equals("PBOCLOG||ECQ_INQUIRE_LOG")) {
+//            transactionType = QPOSService.TransactionType.PBOCLOG;
+//        } else if (transactionTypeString.equals("SALE")) {
+//            transactionType = QPOSService.TransactionType.SALE;
+//        } else if (transactionTypeString.equals("PREAUTH")) {
+//            transactionType = QPOSService.TransactionType.PREAUTH;
+//        } else if (transactionTypeString.equals("ECQ_DESIGNATED_LOAD")) {
+//            transactionType = QPOSService.TransactionType.ECQ_DESIGNATED_LOAD;
+//        } else if (transactionTypeString.equals("ECQ_UNDESIGNATED_LOAD")) {
+//            transactionType = QPOSService.TransactionType.ECQ_UNDESIGNATED_LOAD;
+//        } else if (transactionTypeString.equals("ECQ_CASH_LOAD")) {
+//            transactionType = QPOSService.TransactionType.ECQ_CASH_LOAD;
+//        } else if (transactionTypeString.equals("ECQ_CASH_LOAD_VOID")) {
+//            transactionType = QPOSService.TransactionType.ECQ_CASH_LOAD_VOID;
+//        } else if (transactionTypeString.equals("CHANGE_PIN")) {
+//            transactionType = QPOSService.TransactionType.UPDATE_PIN;
+//        } else if (transactionTypeString.equals("REFOUND")) {
+//            transactionType = QPOSService.TransactionType.REFUND;
+//        } else if (transactionTypeString.equals("SALES_NEW")) {
+//            transactionType = QPOSService.TransactionType.SALES_NEW;
+//        }
+        pos.setAmount(amount, cashbackAmount, currencyCode, QPOSService.TransactionType.values()[transactionType]);
     }
 
     @ReactMethod
@@ -242,6 +259,31 @@ public class NativePosModule extends ReactContextBaseJavaModule {
 
     }
 
+    @ReactMethod
+    public Hashtable getICCTag(int encryType, int cardType, int tagCount, String tagArrStr) {
+       return pos.getICCTag(QPOSService.EncryptType.values()[encryType],cardType,tagCount,tagArrStr);
+    }
+
+    @ReactMethod
+    public void selectEmvApp(int applicationIndex) {
+        pos.selectEmvApp(applicationIndex);
+    }
+
+    @ReactMethod
+    public void doEmvApp(int emvOption) {
+        pos.doEmvApp(QPOSService.EmvOption.values()[emvOption]);
+    }
+
+    @ReactMethod
+    public Hashtable<String, String> getNFCBatchData() {
+        return pos.getNFCBatchData();
+    }
+
+    @ReactMethod
+    public void updateEMVConfigByXml(String xmlData) {
+        pos.updateEMVConfigByXml(xmlData);
+    }
+
     class MyQposClass extends CQPOSService {
 
         public Map<String, String> deviceList = new HashMap<String, String>();
@@ -251,7 +293,6 @@ public class NativePosModule extends ReactContextBaseJavaModule {
             TRACE.d("onRequestWaitingUser()");
             String waitingInfo = context.getString(R.string.waiting_for_card);
             sendMsg("onRequestWaitingUser", waitingInfo);
-
         }
 
         @Override
@@ -261,7 +302,7 @@ public class NativePosModule extends ReactContextBaseJavaModule {
             if (result == QPOSService.DoTradeResult.NONE) {
                 content = context.getString(R.string.no_card_detected);
             } else if (result == QPOSService.DoTradeResult.ICC) {
-                pos.doEmvApp(QPOSService.EmvOption.START);
+//                pos.doEmvApp(QPOSService.EmvOption.START);
             } else if (result == QPOSService.DoTradeResult.NOT_ICC) {
                 content = context.getString(R.string.card_inserted);
             } else if (result == QPOSService.DoTradeResult.BAD_SWIPE) {
@@ -462,7 +503,7 @@ public class NativePosModule extends ReactContextBaseJavaModule {
             } else if (result == QPOSService.DoTradeResult.NO_RESPONSE) {
                 content += context.getString(R.string.card_no_response);
             }
-            sendMsg("onDoTradeResult", content);
+            sendMsg("onDoTradeResult", "DoTradeResult_"+result.toString(),JSONObject.toJSONString(decodeData));
 
         }
 
@@ -502,7 +543,7 @@ public class NativePosModule extends ReactContextBaseJavaModule {
             content += context.getString(R.string.track_3_supported) + isSupportedTrack3 + "\n";
             content += "PCI FirmwareVresion:" + pciFirmwareVersion + "\n";
             content += "PCI HardwareVersion:" + pciHardwareVersion + "\n";
-            sendMsg("onQposInfoResult", content);
+            sendMsg("onQposInfoResult", "",JSONObject.toJSONString(posInfoData));
         }
 
         /**
@@ -511,16 +552,16 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         @Override
         public void onRequestTransactionResult(QPOSService.TransactionResult transactionResult) {
             TRACE.d("onRequestTransactionResult()" + transactionResult.toString());
-            if (transactionResult != QPOSService.TransactionResult.APPROVED) {
-                sendMsg("onRequestTransactionResult", transactionResult.toString());
-            }
+//            if (transactionResult != QPOSService.TransactionResult.APPROVED) {
+                sendMsg("onRequestTransactionResult", "TransactionResult_"+transactionResult.toString());
+//            }
         }
 
         @Override
         public void onRequestBatchData(String tlv) {
             TRACE.d("ICC trade finished");
             TRACE.d("onRequestBatchData(String tlv):" + tlv);
-            sendMsg("onRequestBatchData", tlv);
+            sendMsg("onRequestBatchData", "",tlv);
         }
 
         @Override
@@ -572,38 +613,38 @@ public class NativePosModule extends ReactContextBaseJavaModule {
             content += "conn: " + pos.getBluetoothState() + "\n";
             content += "psamId: " + psamId + "\n";
             content += "NFCId: " + NFCId + "\n";
-            sendMsg("onQposIdResult", content);
-            }
+            sendMsg("onQposIdResult", "",JSONObject.toJSONString(posIdTable));
+        }
 
         @Override
         public void onRequestSelectEmvApp(ArrayList<String> appList) {
             TRACE.d("onRequestSelectEmvApp():" + appList.toString());
-            sendMsg("onRequestSelectEmvApp","");
-            Dialog dialog = new Dialog(getCurrentActivity());
-            dialog.setContentView(R.layout.emv_app_dialog);
-            dialog.setTitle(R.string.please_select_app);
-            String[] appNameList = new String[appList.size()];
-            for (int i = 0; i < appNameList.length; ++i) {
-                appNameList[i] = appList.get(i);
-            }
-            ListView appListView = (ListView) dialog.findViewById(R.id.appList);
-            appListView.setAdapter(new ArrayAdapter<String>(getCurrentActivity(), android.R.layout.simple_list_item_1, appNameList));
-            appListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    pos.selectEmvApp(position);
-                    TRACE.d("select emv app position = " + position);
-                    dialog.dismiss();
-                }
-            });
-            dialog.findViewById(R.id.cancelButton).setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    pos.cancelSelectEmvApp();
-                    dialog.dismiss();
-                }
-            });
-            dialog.show();
+            sendMsg("onRequestSelectEmvApp","",JSONObject.toJSONString(appList));
+//            Dialog dialog = new Dialog(getCurrentActivity());
+//            dialog.setContentView(R.layout.emv_app_dialog);
+//            dialog.setTitle(R.string.please_select_app);
+//            String[] appNameList = new String[appList.size()];
+//            for (int i = 0; i < appNameList.length; ++i) {
+//                appNameList[i] = appList.get(i);
+//            }
+//            ListView appListView = (ListView) dialog.findViewById(R.id.appList);
+//            appListView.setAdapter(new ArrayAdapter<String>(getCurrentActivity(), android.R.layout.simple_list_item_1, appNameList));
+//            appListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//                @Override
+//                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                    pos.selectEmvApp(position);
+//                    TRACE.d("select emv app position = " + position);
+//                    dialog.dismiss();
+//                }
+//            });
+//            dialog.findViewById(R.id.cancelButton).setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    pos.cancelSelectEmvApp();
+//                    dialog.dismiss();
+//                }
+//            });
+//            dialog.show();
         }
 
         @Override
@@ -618,7 +659,6 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         @Override
         public void onRequestIsServerConnected() {
             TRACE.d("onRequestIsServerConnected()");
-//        pos.isServerConnected(true);
         }
 
         @Override
@@ -630,8 +670,8 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         @Override
         public void onRequestTime() {
             TRACE.d("onRequestTime");
-            String terminalTime = new SimpleDateFormat("yyyyMMddHHmmss").format(Calendar.getInstance().getTime());
-            pos.sendTime(terminalTime);
+            sendMsg("onRequestTime", "");
+//            String terminalTime = new SimpleDateFormat("yyyyMMddHHmmss").format(Calendar.getInstance().getTime());
         }
 
         @Override
@@ -665,26 +705,24 @@ public class NativePosModule extends ReactContextBaseJavaModule {
             } else if (displayMsg == QPOSService.Display.CARD_REMOVED) {
                 msg = "card removed";
             }
-            sendMsg("onRequestDisplay", msg);
+            sendMsg("onRequestDisplay", "Display_"+displayMsg.toString());
         }
 
         @Override
         public void onRequestFinalConfirm() {
             TRACE.d("onRequestFinalConfirm() ");
-            TRACE.d("onRequestFinalConfirm - S");
-
         }
 
         @Override
         public void onRequestNoQposDetected() {
             TRACE.d("onRequestNoQposDetected()");
-            sendMsg("onRequestNoQposDetected", "onRequestNoQposDetected");
+            sendMsg("onRequestNoQposDetected", "");
         }
 
         @Override
         public void onRequestQposConnected() {
             TRACE.d("onRequestQposConnected()");
-            sendMsg("onRequestQposConnected", "Device connect");
+            sendMsg("onRequestQposConnected", "");
 
         }
 
@@ -696,51 +734,46 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         @Override
         public void onError(QPOSService.Error errorState) {
             TRACE.d("onError" + errorState.toString());
-            String content = "";
-            if (errorState == QPOSService.Error.CMD_NOT_AVAILABLE) {
-                content = context.getString(R.string.command_not_available);
-            } else if (errorState == QPOSService.Error.TIMEOUT) {
-                content = context.getString(R.string.device_no_response);
-            } else if (errorState == QPOSService.Error.DEVICE_RESET) {
-                content = context.getString(R.string.device_reset);
-            } else if (errorState == QPOSService.Error.UNKNOWN) {
-                content = context.getString(R.string.unknown_error);
-            } else if (errorState == QPOSService.Error.DEVICE_BUSY) {
-                content = context.getString(R.string.device_busy);
-            } else if (errorState == QPOSService.Error.INPUT_OUT_OF_RANGE) {
-                content = context.getString(R.string.out_of_range);
-            } else if (errorState == QPOSService.Error.INPUT_INVALID_FORMAT) {
-                content = context.getString(R.string.invalid_format);
-            } else if (errorState == QPOSService.Error.INPUT_ZERO_VALUES) {
-                content = context.getString(R.string.zero_values);
-            } else if (errorState == QPOSService.Error.INPUT_INVALID) {
-                content = context.getString(R.string.input_invalid);
-            } else if (errorState == QPOSService.Error.CASHBACK_NOT_SUPPORTED) {
-                content = context.getString(R.string.cashback_not_supported);
-            } else if (errorState == QPOSService.Error.CRC_ERROR) {
-                content = context.getString(R.string.crc_error);
-            } else if (errorState == QPOSService.Error.COMM_ERROR) {
-                content = context.getString(R.string.comm_error);
-            } else if (errorState == QPOSService.Error.MAC_ERROR) {
-                content = context.getString(R.string.mac_error);
-            } else if (errorState == QPOSService.Error.APP_SELECT_TIMEOUT) {
-                content = context.getString(R.string.app_select_timeout_error);
-            } else if (errorState == QPOSService.Error.CMD_TIMEOUT) {
-                content = context.getString(R.string.cmd_timeout);
-            } else if (errorState == QPOSService.Error.ICC_ONLINE_TIMEOUT) {
-                if (pos == null) {
-                    return;
-                }
-                pos.resetPosStatus();
-
-            }
-            sendMsg("onError", content);
+//            String content = "";
+//            if (errorState == QPOSService.Error.CMD_NOT_AVAILABLE) {
+//                content = context.getString(R.string.command_not_available);
+//            } else if (errorState == QPOSService.Error.TIMEOUT) {
+//                content = context.getString(R.string.device_no_response);
+//            } else if (errorState == QPOSService.Error.DEVICE_RESET) {
+//                content = context.getString(R.string.device_reset);
+//            } else if (errorState == QPOSService.Error.UNKNOWN) {
+//                content = context.getString(R.string.unknown_error);
+//            } else if (errorState == QPOSService.Error.DEVICE_BUSY) {
+//                content = context.getString(R.string.device_busy);
+//            } else if (errorState == QPOSService.Error.INPUT_OUT_OF_RANGE) {
+//                content = context.getString(R.string.out_of_range);
+//            } else if (errorState == QPOSService.Error.INPUT_INVALID_FORMAT) {
+//                content = context.getString(R.string.invalid_format);
+//            } else if (errorState == QPOSService.Error.INPUT_ZERO_VALUES) {
+//                content = context.getString(R.string.zero_values);
+//            } else if (errorState == QPOSService.Error.INPUT_INVALID) {
+//                content = context.getString(R.string.input_invalid);
+//            } else if (errorState == QPOSService.Error.CASHBACK_NOT_SUPPORTED) {
+//                content = context.getString(R.string.cashback_not_supported);
+//            } else if (errorState == QPOSService.Error.CRC_ERROR) {
+//                content = context.getString(R.string.crc_error);
+//            } else if (errorState == QPOSService.Error.COMM_ERROR) {
+//                content = context.getString(R.string.comm_error);
+//            } else if (errorState == QPOSService.Error.MAC_ERROR) {
+//                content = context.getString(R.string.mac_error);
+//            } else if (errorState == QPOSService.Error.APP_SELECT_TIMEOUT) {
+//                content = context.getString(R.string.app_select_timeout_error);
+//            } else if (errorState == QPOSService.Error.CMD_TIMEOUT) {
+//                content = context.getString(R.string.cmd_timeout);
+//            } else if (errorState == QPOSService.Error.ICC_ONLINE_TIMEOUT) {
+//            }
+            sendMsg("onError", "Error_"+errorState.toString());
         }
 
         @Override
         public void onReturnReversalData(String tlv) {
             TRACE.d("onReturnReversalData(): " + tlv);
-            sendMsg("onReturnReversalData", tlv);
+            sendMsg("onReturnReversalData", "",tlv);
         }
 
         @Override
@@ -750,6 +783,7 @@ public class NativePosModule extends ReactContextBaseJavaModule {
             String pinKsn = result.get("pinKsn");
             String content = "get pin result\n";
             TRACE.i(content);
+            sendMsg("onReturnGetPinResult", "",JSONObject.toJSONString(result));
         }
 
         @Override
@@ -812,11 +846,13 @@ public class NativePosModule extends ReactContextBaseJavaModule {
 //        } else if (result == QPOSService.UpdateInformationResult.UPDATE_PACKET_LEN_ERROR) {
 //            statusEditText.setText("update work key packet len error");
 //        }
+            sendMsg("onReturnGetPinResult", result.toString());
         }
 
         @Override
         public void onReturnCustomConfigResult(boolean isSuccess, String result) {
             TRACE.d("onReturnCustomConfigResult(boolean isSuccess, String result):" + isSuccess + TRACE.NEW_LINE + result);
+            sendMsg("onReturnCustomConfigResult", isSuccess? "Success":"Fail");
         }
 
         @Override
@@ -828,6 +864,7 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         @Override
         public void onReturnSetMasterKeyResult(boolean isSuccess) {
             TRACE.d("onReturnSetMasterKeyResult(boolean isSuccess) : " + isSuccess);
+            sendMsg("onReturnSetMasterKeyResult", isSuccess? "Success":"Fail");
         }
 
         @Override
@@ -843,21 +880,25 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         @Override
         public void onBluetoothBondFailed() {
             TRACE.d("onBluetoothBondFailed()");
+            sendMsg("onBluetoothBondFailed","");
         }
 
         @Override
         public void onBluetoothBondTimeout() {
             TRACE.d("onBluetoothBondTimeout()");
+            sendMsg("onBluetoothBondTimeout","");
         }
 
         @Override
         public void onBluetoothBonded() {
             TRACE.d("onBluetoothBonded()");
+            sendMsg("onBluetoothBonded","");
         }
 
         @Override
         public void onBluetoothBonding() {
             TRACE.d("onBluetoothBonding()");
+            sendMsg("onBluetoothBonding","");
         }
 
         @Override
@@ -866,19 +907,22 @@ public class NativePosModule extends ReactContextBaseJavaModule {
             String s = "serviceCode: " + result.get("serviceCode");
             s += "\n";
             s += "trackblock: " + result.get("trackblock");
+            sendMsg("onReturniccCashBack","",JSONObject.toJSONString(result));
         }
 
         @Override
         public void onLcdShowCustomDisplay(boolean arg0) {
             TRACE.d("onLcdShowCustomDisplay(boolean arg0):" + arg0);
+            sendMsg("onLcdShowCustomDisplay", arg0? "Success":"Fail");
         }
 
         @Override
         public void onUpdatePosFirmwareResult(QPOSService.UpdateInformationResult arg0) {
             TRACE.d("onUpdatePosFirmwareResult(UpdateInformationResult arg0):" + arg0.toString());
-            if (arg0 != QPOSService.UpdateInformationResult.UPDATE_SUCCESS) {
+//            if (arg0 != QPOSService.UpdateInformationResult.UPDATE_SUCCESS) {
 //            updateThread.concelSelf();
-            }
+//            }
+            sendMsg("onUpdatePosFirmwareResult", arg0.toString());
         }
 
         @Override
@@ -898,6 +942,7 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         @Override
         public void onGetPosComm(int mod, String amount, String posid) {
             TRACE.d("onGetPosComm(int mod, String amount, String posid):" + mod + TRACE.NEW_LINE + amount + TRACE.NEW_LINE + posid);
+            sendMsg("onGetPosComm", mod + TRACE.NEW_LINE + amount + TRACE.NEW_LINE + posid);
         }
 
         @Override
@@ -908,11 +953,13 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         @Override
         public void onUpdateMasterKeyResult(boolean arg0, Hashtable<String, String> arg1) {
             TRACE.d("onUpdateMasterKeyResult(boolean arg0, Hashtable<String, String> arg1):" + arg0 + TRACE.NEW_LINE + arg1.toString());
+            sendMsg("onUpdateMasterKeyResult", arg0? "Success":"Fail",JSONObject.toJSONString(arg1));
         }
 
         @Override
         public void onEmvICCExceptionData(String arg0) {
             TRACE.d("onEmvICCExceptionData(String arg0):" + arg0);
+            sendMsg("onEmvICCExceptionData", "",arg0);
         }
 
         @Override
@@ -1022,16 +1069,19 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         @Override
         public void onReturnUpdateIPEKResult(boolean arg0) {
             TRACE.d("onReturnUpdateIPEKResult(boolean arg0):" + arg0);
+            sendMsg("onReturnUpdateIPEKResult",arg0? "Success":"Fail");
         }
 
         @Override
         public void onReturnUpdateEMVRIDResult(boolean arg0) {
             TRACE.d("onReturnUpdateEMVRIDResult(boolean arg0):" + arg0);
+            sendMsg("onReturnUpdateEMVRIDResult",arg0? "Success":"Fail");
         }
 
         @Override
         public void onReturnUpdateEMVResult(boolean arg0) {
             TRACE.d("onReturnUpdateEMVResult(boolean arg0):" + arg0);
+            sendMsg("onReturnUpdateEMVResult",arg0? "Success":"Fail");
         }
 
         @Override
@@ -1052,6 +1102,7 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         @Override
         public void onSetSleepModeTime(boolean arg0) {
             TRACE.d("onSetSleepModeTime(boolean arg0):" + arg0);
+            sendMsg("onSetSleepModeTime",arg0? "Success":"Fail");
         }
 
         @Override
@@ -1074,6 +1125,7 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         @Override
         public void onRequestUpdateKey(String arg0) {
             TRACE.d("onRequestUpdateKey(String arg0):" + arg0);
+            sendMsg("onRequestUpdateKey","",arg0);
         }
 
         @Override
@@ -1118,18 +1170,6 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         }
 
         @Override
-        public void onGetKeyCheckValue(List<String> checkValue) {
-            if (checkValue != null) {
-                StringBuffer buffer = new StringBuffer();
-                buffer.append("{");
-                for (int i = 0; i < checkValue.size(); i++) {
-                    buffer.append(checkValue.get(i)).append(",");
-                }
-                buffer.append("}");
-            }
-        }
-
-        @Override
         public void onGetDevicePubKey(String clearKeys) {
             TRACE.d("onGetDevicePubKey(clearKeys):" + clearKeys);
 //        statusEditText.setText(clearKeys);
@@ -1145,13 +1185,14 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         @Override
         public void onTradeCancelled() {
             TRACE.d("onTradeCancelled");
+            sendMsg("onTradeCancelled","");
         }
 
         @Override
         public void onReturnSignature(boolean b, String signaturedData) {
             if (b) {
-                BASE64Encoder base64Encoder = new BASE64Encoder();
-                String encode = base64Encoder.encode(signaturedData.getBytes());
+//                BASE64Encoder base64Encoder = new BASE64Encoder();
+//                String encode = base64Encoder.encode(signaturedData.getBytes());
             }
         }
 
@@ -1289,15 +1330,20 @@ public class NativePosModule extends ReactContextBaseJavaModule {
             // TODO Auto-generated method stub
             TRACE.d("onRequestNoQposDetectedUnbond()");
         }
-
     }
 
 
+
     private void sendMsg(String key, String result) {
+        sendMsg(key,result,"");
+    }
+
+    private void sendMsg(String key, String result,String data) {
         Log.w("sendMsg", "sendMsg==" + key);
         WritableMap params = Arguments.createMap();
-        params.putString("key", key);
+        params.putString("method", key);
         params.putString("result", result);
+        params.putString("data", data);
         sendEvent(getReactApplicationContext(), "NativePosReminder", params);
     }
 

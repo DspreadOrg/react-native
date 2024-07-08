@@ -29,6 +29,15 @@ export const MPosTransactionType = {
     TransactionType_UPDATE_PIN : 18,
 }
 
+const communicationMode = [
+  'BLUETOOTH',
+  'BLUETOOTH_BLE',
+  'UART',
+  'USB_OTG_CDC_ACM',
+  'AUDIO',
+   ];
+
+
 const EmvOption = {
     EmvOption_START : 0,
     EmvOption_START_WITH_FORCE_ONLINE : 1,
@@ -58,21 +67,23 @@ const CHECKVALUE_KEYTYPE = {
 }
 
 const CardTradeMode = {
-    CardTradeMode_ONLY_INSERT_CARD : 0,
-    CardTradeMode_ONLY_SWIPE_CARD : 1,
-    CardTradeMode_SWIPE_INSERT_CARD : 2,
-    CardTradeMode_UNALLOWED_LOW_TRADE : 3,
-    CardTradeMode_SWIPE_TAP_INSERT_CARD : 4,// add 20150715
-    CardTradeMode_SWIPE_TAP_INSERT_CARD_UNALLOWED_LOW_TRADE : 5,
-    CardTradeMode_ONLY_TAP_CARD : 6,
-    CardTradeMode_SWIPE_TAP_INSERT_CARD_NOTUP : 7,
-    CardTradeMode_TAP_INSERT_CARD_NOTUP : 8,//无上翻键
-    CardTradeMode_TAP_INSERT_CARD_TUP : 9,//有上翻键
-    CardTradeMode_SWIPE_TAP_INSERT_CARD_Down : 10,//下翻建
-    CardTradeMode_SWIPE_TAP_INSERT_CARD_NOTUP_UNALLOWED_LOW_TRADE : 11,
-    CardTradeMode_SWIPE_INSERT_CARD_UNALLOWED_LOW_TRADE : 12,
-    CardTradeMode_SWIPE_TAP_INSERT_CARD_UNALLOWED_LOW_TRADE_NEW : 13,
-    CardTradeMode_SWIPE_TAP_INSERT_CARD_NOTUP_DELAY : 14,
+  CardTradeMode_ONLY_INSERT_CARD : 0,
+  CardTradeMode_ONLY_SWIPE_CARD : 1,
+  CardTradeMode_TAP_INSERT_CARD : 2,
+  CardTradeMode_TAP_INSERT_CARD_NOTUP : 3,
+  CardTradeMode_SWIPE_TAP_INSERT_CARD : 4,
+  CardTradeMode_UNALLOWED_LOW_TRADE : 5,
+  CardTradeMode_SWIPE_INSERT_CARD : 6,
+  CardTradeMode_SWIPE_TAP_INSERT_CARD_UNALLOWED_LOW_TRADE : 7,
+  CardTradeMode_SWIPE_TAP_INSERT_CARD_NOTUP_UNALLOWED_LOW_TRADE : 8,
+  CardTradeMode_ONLY_TAP_CARD : 9,
+  CardTradeMode_ONLY_TAP_CARD_QF : 10,
+  CardTradeMode_SWIPE_TAP_INSERT_CARD_NOTUP : 11,
+  CardTradeMode_SWIPE_TAP_INSERT_CARD_DOWN : 12,
+  CardTradeMode_SWIPE_INSERT_CARD_UNALLOWED_LOW_TRADE : 13,
+  CardTradeMode_SWIPE_TAP_INSERT_CARD_UNALLOWED_LOW_TRADE_NEW : 14,
+  CardTradeMode_ONLY_INSERT_CARD_NOPIN : 15,
+  CardTradeMode_SWIPE_TAP_INSERT_CARD_NOTUP_DELAY : 16,
 }
 
 export default class catComponent extends Component {
@@ -232,7 +243,8 @@ export default class catComponent extends Component {
       this.setState({
         transactionData : message
       });
-      //pos.getICCTag(EncryptType_plaintext,0,2,"9F3495");//get 9F34, 95 tag from terminal
+      //let data = pos.getICCTag(EncryptType.EncryptType_plaintext,0,2,"9F3495");//get 9F34, 95 tag from terminal
+      //console.log("getICCTag: " + data);
       pos.sendOnlineProcessResult("8A023030");
     }else if(msg.method == "onRequestTransactionResult"){
       this.setState({
@@ -258,12 +270,23 @@ export default class catComponent extends Component {
       this.setState({
         transactionData : message
       });
+    }else if(msg.method == "onReturnCustomConfigResult"){
+      this.setState({
+        transactionData : message
+      });
+    }else{
+      this.setState({
+        transactionData : message
+      });
     }
    }
    _onPressItem(item) {
-    pos.stopQPos2Mode();
     console.log("connectBluetooth: " + item.key);
+    pos.stopQPos2Mode();
     pos.connectBT(item.key);
+    this.setState({
+      bluetoothName : []
+    });
    }
   /**
    * RN调用Native且通过Callback回调 通信方式
@@ -272,6 +295,7 @@ export default class catComponent extends Component {
       this.setState({
            bluetoothName : []
       });
+      pos.initPos(communicationMode[0]);
       console.log("scanBluetooth");
       pos.scanQPos2Mode(10);
    }
@@ -285,6 +309,10 @@ export default class catComponent extends Component {
    disconnect(msg) {
       console.log("disconnect");
       pos.disconnectBT();
+      this.setState = ({
+        bluetoothName: [],
+        transactionData: "",
+       });
    }
 
    getQposId(msg) {
