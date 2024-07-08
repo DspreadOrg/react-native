@@ -29,15 +29,18 @@ RCT_EXPORT_METHOD(stopQPos2Mode){
   [self.bt stopQPos2Mode];
 }
 
-RCT_EXPORT_METHOD(connectBT:(NSString *)bluetoothName){
+RCT_EXPORT_METHOD(initPos:(NSString *)mode){
   if (nil == self.pos) {
       self.pos = [QPOSService sharedInstance];
   }
   [self.pos setDelegate:self];
   [self.pos setQueue:nil];
   [self.pos setPosType:PosType_BLUETOOTH_2mode];
-  [self.pos connectBT:bluetoothName];
   [self.pos setBTAutoDetecting:true];
+}
+
+RCT_EXPORT_METHOD(connectBT:(NSString *)bluetoothName){
+  [self.pos connectBT:bluetoothName];
 }
 
 RCT_EXPORT_METHOD(disconnectBT){
@@ -414,39 +417,39 @@ RCT_EXPORT_METHOD(cancelTrade:(BOOL)isUserCancel){
 -(void) onDHError: (DHError)errorState{
     NSString *msg = @"";
     if(errorState ==DHError_TIMEOUT) {
-        msg = @"DHError_TIMEOUT";
+        msg = @"Error_TIMEOUT";
     } else if(errorState == DHError_DEVICE_RESET) {
-        msg = @"DHError_DEVICE_RESET";
+        msg = @"Error_DEVICE_RESET";
     } else if(errorState == DHError_UNKNOWN) {
-        msg = @"DHError_UNKNOWN";
+        msg = @"Error_UNKNOWN";
     } else if(errorState == DHError_DEVICE_BUSY) {
-        msg = @"DHError_DEVICE_BUSY";
+        msg = @"Error_DEVICE_BUSY";
     } else if(errorState == DHError_INPUT_OUT_OF_RANGE) {
-        msg = @"DHError_INPUT_OUT_OF_RANGE";
+        msg = @"Error_INPUT_OUT_OF_RANGE";
     } else if(errorState == DHError_INPUT_INVALID_FORMAT) {
-        msg = @"DHError_INPUT_INVALID_FORMAT";
+        msg = @"Error_INPUT_INVALID_FORMAT";
     } else if(errorState == DHError_INPUT_ZERO_VALUES) {
-        msg = @"DHError_INPUT_ZERO_VALUES";
+        msg = @"Error_INPUT_ZERO_VALUES";
     } else if(errorState == DHError_INPUT_INVALID) {
-        msg = @"DHError_INPUT_INVALID";
+        msg = @"Error_INPUT_INVALID";
     } else if(errorState == DHError_CASHBACK_NOT_SUPPORTED) {
-        msg = @"DHError_CASHBACK_NOT_SUPPORTED";
+        msg = @"Error_CASHBACK_NOT_SUPPORTED";
     } else if(errorState == DHError_CRC_ERROR) {
-        msg = @"DHError_CRC_ERROR";
+        msg = @"Error_CRC_ERROR";
     } else if(errorState == DHError_COMM_ERROR) {
-        msg = @"DHError_COMM_ERROR";
+        msg = @"Error_COMM_ERROR";
     }else if(errorState == DHError_MAC_ERROR){
-        msg = @"DHError_MAC_ERROR";
+        msg = @"Error_MAC_ERROR";
     }else if(errorState == DHError_CMD_TIMEOUT){
-        msg = @"DHError_CMD_TIMEOUT";
+        msg = @"Error_CMD_TIMEOUT";
     }else if(errorState == DHError_AMOUNT_OUT_OF_LIMIT){
-        msg = @"DHError_AMOUNT_OUT_OF_LIMIT";
+        msg = @"Error_AMOUNT_OUT_OF_LIMIT";
     }else if(errorState == DHError_CMD_NOT_AVAILABLE){
-        msg = @"DHError_CMD_NOT_AVAILABLE";
+        msg = @"Error_CMD_NOT_AVAILABLE";
     }else{
         msg = [NSString stringWithFormat: @"Not Implemented %ld",(long)errorState];
     }
-  [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onDHError",@"result":msg,@"data":@""}];
+  [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onError",@"result":msg,@"data":@""}];
 }
 
 -(void) onQposIdResult: (NSDictionary*)posId{
@@ -480,10 +483,9 @@ RCT_EXPORT_METHOD(cancelTrade:(BOOL)isUserCancel){
   [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onTradeCancelled",@"result":@"success",@"data":@""}];
 }
 
-
 // callback function of updateEmvConfig and updateEMVConfigByXml api.
 -(void)onReturnCustomConfigResult:(BOOL)isSuccess config:(NSString*)resutl{
-  NSString *result = isSuccess? @"success":@"fail";
+  NSString *result = isSuccess? @"Success":@"Fail";
   [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onReturnCustomConfigResult",@"result":result,@"data":resutl}];
 }
 

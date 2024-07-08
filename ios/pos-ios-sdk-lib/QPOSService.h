@@ -208,18 +208,20 @@ typedef NS_ENUM(NSInteger, AmountType) {
 typedef NS_ENUM(NSInteger, CardTradeMode) {
     CardTradeMode_ONLY_INSERT_CARD,
     CardTradeMode_ONLY_SWIPE_CARD,
-    CardTradeMode_SWIPE_INSERT_CARD,
+    CardTradeMode_TAP_INSERT_CARD,
+    CardTradeMode_TAP_INSERT_CARD_NOTUP,
+    CardTradeMode_SWIPE_TAP_INSERT_CARD,
     CardTradeMode_UNALLOWED_LOW_TRADE,
-    CardTradeMode_SWIPE_TAP_INSERT_CARD,// add 20150715
+    CardTradeMode_SWIPE_INSERT_CARD,
     CardTradeMode_SWIPE_TAP_INSERT_CARD_UNALLOWED_LOW_TRADE,
-    CardTradeMode_ONLY_TAP_CARD,
-    CardTradeMode_SWIPE_TAP_INSERT_CARD_NOTUP,
-    CardTradeMode_TAP_INSERT_CARD_NOTUP,//无上翻键
-    CardTradeMode_TAP_INSERT_CARD_TUP,//有上翻键
-    CardTradeMode_SWIPE_TAP_INSERT_CARD_Down,//下翻建
     CardTradeMode_SWIPE_TAP_INSERT_CARD_NOTUP_UNALLOWED_LOW_TRADE,
+    CardTradeMode_ONLY_TAP_CARD,
+    CardTradeMode_ONLY_TAP_CARD_QF,
+    CardTradeMode_SWIPE_TAP_INSERT_CARD_NOTUP,
+    CardTradeMode_SWIPE_TAP_INSERT_CARD_DOWN,
     CardTradeMode_SWIPE_INSERT_CARD_UNALLOWED_LOW_TRADE,
     CardTradeMode_SWIPE_TAP_INSERT_CARD_UNALLOWED_LOW_TRADE_NEW,
+    CardTradeMode_ONLY_INSERT_CARD_NOPIN,
     CardTradeMode_SWIPE_TAP_INSERT_CARD_NOTUP_DELAY,
 };
 
