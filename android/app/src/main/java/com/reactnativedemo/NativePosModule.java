@@ -145,7 +145,6 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         //init handler
         Handler handler = new Handler(Looper.myLooper());
         pos.initListener(handler, listener);
-
     }
 
     @ReactMethod
@@ -282,6 +281,16 @@ public class NativePosModule extends ReactContextBaseJavaModule {
     @ReactMethod
     public void updateEMVConfigByXml(String xmlData) {
         pos.updateEMVConfigByXml(xmlData);
+    }
+
+    @ReactMethod
+    public void updateEmvAPPByTlv(int operationType, String appTlv) {
+        pos.updateEmvAPPByTlv(QPOSService.EMVDataOperation.values()[operationType],appTlv);
+    }
+
+    @ReactMethod
+    public void updateEmvCAPKByTlv(int operationType, String capkTlv) {
+        pos.updateEmvCAPKByTlv(QPOSService.EMVDataOperation.values()[operationType],capkTlv);
     }
 
     class MyQposClass extends CQPOSService {
@@ -504,7 +513,6 @@ public class NativePosModule extends ReactContextBaseJavaModule {
                 content += context.getString(R.string.card_no_response);
             }
             sendMsg("onDoTradeResult", "DoTradeResult_"+result.toString(),JSONObject.toJSONString(decodeData));
-
         }
 
         @Override
@@ -1107,9 +1115,7 @@ public class NativePosModule extends ReactContextBaseJavaModule {
 
         @Override
         public void onReturnGetEMVListResult(String arg0) {
-            TRACE.d("onReturnGetEMVListResult(String arg0):" + arg0);
-            if (arg0 != null && arg0.length() > 0) {
-            }
+            sendMsg("onReturnGetEMVListResult",arg0);
         }
 
         @Override

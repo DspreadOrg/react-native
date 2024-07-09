@@ -365,7 +365,7 @@ export default class catComponent extends Component {
  }
 
  updateEMVConfigByTlv(msg) {
-  console.log("updateEMVConfigByApp");
+  console.log("updateEMVConfigByTlv");
   //update visa cvm limit
   pos.updateEmvAPPByTlv(EMVOperation.EMVOperation_update,"9F0607A00000000310109F92810E06000000050000");
   //pos.updateEmvAPPByTlv(EMVOperation.EMVOperation_update,"9F0607A00000000320109F92810E06000000050000");
