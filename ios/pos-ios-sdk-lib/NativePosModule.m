@@ -139,6 +139,14 @@ RCT_EXPORT_METHOD(cancelTrade:(BOOL)isUserCancel){
   [self.pos cancelTrade:true];
 }
 
+RCT_EXPORT_METHOD(updateEmvAPPByTlv:(NSInteger)emvOperation appTlv:(NSString *)appTlv){
+  [self.pos updateEmvAPPByTlv:emvOperation appTlv:appTlv];
+}
+
+RCT_EXPORT_METHOD(updateEmvCAPKByTlv:(NSInteger)emvOperation capkTlv:(NSString *)capkTlv){
+  [self.pos updateEmvCAPKByTlv:emvOperation capkTlv:capkTlv];
+}
+
 -(void)scanBluetooth:(NSInteger)time{
     if (self.bt == nil) {
         self.bt = [BTDeviceFinder new];
@@ -163,7 +171,6 @@ RCT_EXPORT_METHOD(cancelTrade:(BOOL)isUserCancel){
 }
 
 -(void)onBluetoothName2Mode:(NSString *)bluetoothName{
-//    NSLog(@"+++onBluetoothName2Mode %@",bluetoothName);
     [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onBluetoothName2Mode",@"result":bluetoothName,@"data":@""}];
 }
 
@@ -175,10 +182,7 @@ RCT_EXPORT_METHOD(cancelTrade:(BOOL)isUserCancel){
 
 -(void)bluetoothIsPowerOff2Mode{
     dispatch_async(dispatch_get_main_queue(),  ^{
-//        NSLog(@"+++bluetoothIsPowerOff2Mode");
-        //        [bt setBluetoothDelegate2Mode:nil];
         [self.bt stopQPos2Mode];
-        //        bt = nil;
     });
 }
 
@@ -479,14 +483,25 @@ RCT_EXPORT_METHOD(cancelTrade:(BOOL)isUserCancel){
   [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onRequestUpdateWorkKeyResult",@"result":updateResult,@"data":@""}];
 }
 
+- (void)onReturnGetEMVListResult:(NSString *)result{
+  [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onReturnGetEMVListResult",@"result":result,@"data":@""}];
+}
+
+- (void)onReturnUpdateEMVResult:(BOOL)isSuccess{
+  [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onReturnUpdateEMVResult",@"result":isSuccess? @"Success":@"Fail",@"data":@""}];
+}
+
+- (void)onReturnUpdateEMVRIDResult:(BOOL)isSuccess{
+  [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onReturnUpdateEMVRIDResult",@"result":isSuccess? @"Success":@"Fail",@"data":@""}];
+}
+
 - (void)onTradeCancelled{
   [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onTradeCancelled",@"result":@"success",@"data":@""}];
 }
 
 // callback function of updateEmvConfig and updateEMVConfigByXml api.
 -(void)onReturnCustomConfigResult:(BOOL)isSuccess config:(NSString*)resutl{
-  NSString *result = isSuccess? @"Success":@"Fail";
-  [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onReturnCustomConfigResult",@"result":result,@"data":resutl}];
+  [self sendEventWithName:@"NativePosReminder" body:@{@"method":@"onReturnCustomConfigResult",@"result":isSuccess? @"Success":@"Fail",@"data":resutl}];
 }
 
 - (NSString *)convertToJsonData:(NSDictionary *)dict{

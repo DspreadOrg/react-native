@@ -7,7 +7,7 @@ const NativePosEmitter = new NativeEventEmitter(pos);
 /**
      * Transaction type.
      */
-export const MPosTransactionType = {
+export const TransactionType = {
     TransactionType_GOODS : 0, // 货物
     TransactionType_SERVICES : 1, // 服务
     TransactionType_CASH : 2,//现金
@@ -37,6 +37,14 @@ const communicationMode = [
   'AUDIO',
    ];
 
+const EMVOperation = {
+    EMVOperation_clear : 0,
+    EMVOperation_add : 1,
+    EMVOperation_delete : 2,
+    EMVOperation_getList : 3,
+    EMVOperation_update : 4,
+    EMVOperation_quickemv : 5,
+};   
 
 const EmvOption = {
     EmvOption_START : 0,
@@ -203,7 +211,7 @@ export default class catComponent extends Component {
       this.setState({
         transactionData : message
       });
-      pos.setAmount("123","","0156",MPosTransactionType.TransactionType_GOODS);
+      pos.setAmount("123","","0156",TransactionType.TransactionType_GOODS);
     }else if(msg.method == "onRequestPinEntry"){
       this.setState({
         transactionData : message
@@ -266,11 +274,23 @@ export default class catComponent extends Component {
         transactionData : message
       });
 
-    }else if(msg.method == "onDHError"){
+    }else if(msg.method == "onError"){
       this.setState({
         transactionData : message
       });
     }else if(msg.method == "onReturnCustomConfigResult"){
+      this.setState({
+        transactionData : message
+      });
+    }else if(msg.method == "onReturnGetEMVListResult"){
+      this.setState({
+        transactionData : message
+      });
+    }else if(msg.method == "onReturnUpdateEMVResult"){
+      this.setState({
+        transactionData : message
+      });
+    }else if(msg.method == "onReturnUpdateEMVRIDResult"){
       this.setState({
         transactionData : message
       });
@@ -343,6 +363,21 @@ export default class catComponent extends Component {
       console.error('Error reading XML file:', error);
     });
  }
+
+ updateEMVConfigByTlv(msg) {
+  console.log("updateEMVConfigByApp");
+  //update visa cvm limit
+  pos.updateEmvAPPByTlv(EMVOperation.EMVOperation_update,"9F0607A00000000310109F92810E06000000050000");
+  //pos.updateEmvAPPByTlv(EMVOperation.EMVOperation_update,"9F0607A00000000320109F92810E06000000050000");
+  //pos.updateEmvAPPByTlv(EMVOperation.EMVOperation_update,"9F0607A00000000330109F92810E06000000050000");
+  //update mastercard cvm limit
+  //pos.updateEmvAPPByTlv(EMVOperation.EMVOperation_update,"9F0607A0000000041010DF812606000000050000");
+  //pos.updateEmvAPPByTlv(EMVOperation.EMVOperation_update,"9F0607A0000000043060DF812606000000050000");
+  //update amex cvm limit
+  //pos.updateEmvAPPByTlv(EMVOperation.EMVOperation_update,"9F0606A000000025019F820906000000050000");
+  //update discover cvm limit
+  //pos.updateEmvAPPByTlv(EMVOperation.EMVOperation_update,"9F0607A00000015230109F820906000000050000");
+}
 
    formattedDate(){
     const date = new Date();
