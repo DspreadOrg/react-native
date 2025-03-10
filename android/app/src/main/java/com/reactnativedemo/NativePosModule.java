@@ -144,7 +144,8 @@ public class NativePosModule extends ReactContextBaseJavaModule {
 //        pos.setConext(context);
         //init handler
         Handler handler = new Handler(Looper.myLooper());
-        pos.initListener(handler, listener);
+//        pos.initListener(handler, listener);
+        pos.initListener(listener);
     }
 
     @ReactMethod
@@ -1176,16 +1177,13 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         }
 
         @Override
-        public void onGetDevicePubKey(String clearKeys) {
+        public void onGetDevicePubKey(Hashtable<String, String> clearKeys) {
             TRACE.d("onGetDevicePubKey(clearKeys):" + clearKeys);
-//        statusEditText.setText(clearKeys);
-            String lenStr = clearKeys.substring(0, 4);
-            int sum = 0;
-            for (int i = 0; i < 4; i++) {
-                int bit = Integer.parseInt(lenStr.substring(i, i + 1));
-                sum += bit * Math.pow(16, (3 - i));
-            }
-//        pubModel = clearKeys.substring(4, 4 + sum * 2);
+            String m = clearKeys.get("modulus");
+            String e = clearKeys.get("exponent");
+//            statusEditText.setText(m.length()+"  "+m+"\n"+e);
+            sendMsg("onQposInfoResult", "",JSONObject.toJSONString(m.length()+"  "+m+"\n"+e));
+
         }
 
         @Override
