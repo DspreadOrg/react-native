@@ -2,6 +2,8 @@ package com.reactnativedemo;
 
 import static android.content.Context.LOCATION_SERVICE;
 
+import static com.facebook.react.bridge.UiThreadUtil.runOnUiThread;
+
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -575,31 +577,36 @@ public class NativePosModule extends ReactContextBaseJavaModule {
 
         @Override
         public void onQposRequestPinResult(List<String> dataList, int offlineTime) {
-            super.onQposRequestPinResult(dataList, offlineTime);
-            keyBoardList = dataList;
-            MyKeyboardView.setKeyBoardListener(new KeyBoardNumInterface() {
-                @Override
-                public void getNumberValue(String value) {
-                    pos.pinMapSync(value, 20);
-                }
+//            super.onQposRequestPinResult(dataList, offlineTime);
+            runOnUiThread(() -> {
+                keyBoardList = dataList;
+                MyKeyboardView.setKeyBoardListener(new KeyBoardNumInterface() {
+                    @Override
+                    public void getNumberValue(String value) {
+                        pos.pinMapSync(value, 20);
+                    }
+                });
+                keyboardUtil = new KeyboardUtil(getCurrentActivity(), keyBoardList);
             });
-            keyboardUtil = new KeyboardUtil(getCurrentActivity(), keyBoardList);
+
         }
 
         @Override
         public void onReturnGetPinInputResult(int num) {
-            super.onReturnGetPinInputResult(num);
-            String s = "";
-            if (num == -1) {
-                if (keyboardUtil != null) {
-                    keyboardUtil.hide();
+//            super.onReturnGetPinInputResult(num);
+            runOnUiThread(() ->{
+                String s = "";
+                if (num == -1) {
+                    if (keyboardUtil != null) {
+                        keyboardUtil.hide();
+                    }
+                } else {
+                    for (int i = 0; i < num; i++) {
+                        s += "*";
+                    }
+                    KeyboardUtil.pinpadEditText.setText(s);
                 }
-            } else {
-                for (int i = 0; i < num; i++) {
-                    s += "*";
-                }
-                KeyboardUtil.pinpadEditText.setText(s);
-            }
+            });
         }
 
         @Override
