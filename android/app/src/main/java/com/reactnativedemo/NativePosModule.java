@@ -186,8 +186,8 @@ public class NativePosModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void setAmount(String amount, String cashbackAmount, String currencyCode,int transactionType) {
-//        Log.w("setAmount", "goods==" + transactionTypeString);
+    public void setAmount(String amount, String cashbackAmount, String currencyCode,String transactionType) {
+        Log.w("setAmount", "goods==" + transactionType);
 //        QPOSService.TransactionType transactionType = QPOSService.TransactionType.GOODS;
 //        if (transactionTypeString.equals("GOODS")) {
 //            transactionType = QPOSService.TransactionType.GOODS;
@@ -228,7 +228,7 @@ public class NativePosModule extends ReactContextBaseJavaModule {
 //        } else if (transactionTypeString.equals("SALES_NEW")) {
 //            transactionType = QPOSService.TransactionType.SALES_NEW;
 //        }
-        pos.setAmount(amount, cashbackAmount, currencyCode, QPOSService.TransactionType.values()[transactionType]);
+        pos.setAmount(amount, cashbackAmount, currencyCode, QPOSService.TransactionType.valueOf(transactionType));
     }
 
     @ReactMethod
