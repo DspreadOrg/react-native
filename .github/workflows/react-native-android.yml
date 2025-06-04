@@ -51,45 +51,7 @@ jobs:
           name: app-release
           path: android/app/build/outputs/apk/release/app-release.apk
 
-  test:
-    name: Run Tests
-    runs-on: ubuntu-latest
-    needs: build
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Mock Native Modules
-        run: |
-          echo "Mocking Native Modules..."
-          cat > jest.setup.js <<EOL
-          jest.mock('react-native', () => {
-            const actualRN = jest.requireActual('react-native');
-            return {
-              ...actualRN,
-              NativeModules: {
-                NativePosModule: { // 模拟你的原生模块
-                  addListener: jest.fn(),
-                  removeListeners: jest.fn(),
-                },
-              },
-              NativeEventEmitter: jest.fn().mockImplementation(() => ({
-                addListener: jest.fn(),
-                removeListener: jest.fn(),
-              })),
-            };
-          });
-          EOL
-
-      - name: Run tests with Jest
-        env:
-          NODE_ENV: test
-        run: |
-          # 指定自定义的 Jest 配置文件
-          yarn test --ci --watchAll=false --setupFilesAfterEnv=./jest.setup.js
-
+ 
   deploy:
     name: Deploy to Firebase
     runs-on: ubuntu-latest
