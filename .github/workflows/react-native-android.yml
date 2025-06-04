@@ -31,19 +31,15 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'yarn'
 
-      - name: Install Ruby (for Cocoapods in React Native)
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: .ruby-version
+      - name: Clean conflicting lock files
+        run: rm -f package-lock.json  # 删除 npm 锁文件
 
       - name: Install dependencies
-        run: |
-          yarn install --frozen-lockfile
-          cd android && ./gradlew dependencies
-          
-      - name: Grant Gradle permission
+        run: yarn install --frozen-lockfile
+
+      - name: Fix Gradle permissions  # 关键修复：在构建前设置权限
         run: chmod +x android/gradlew
-        
+
       - name: Build Android APK
         run: |
           cd android
@@ -62,30 +58,22 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Run unit tests
-        run: yarn test --ci --watchAll=false
-
-      - name: Run ESLint
-        run: yarn lint
+      - run: yarn install --frozen-lockfile
+      - run: yarn test --ci --watchAll=false
+      - run: yarn lint
 
   deploy:
     name: Deploy to Firebase
     runs-on: ubuntu-latest
     needs: [build, test]
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/master'  # 注意分支名与触发条件一致
 
     steps:
       - name: Download APK artifact
         uses: actions/download-artifact@v4
         with:
           name: app-release
-
-      - name: Deploy to Firebase App Distribution
-        uses: wzieba/Firebase-Distribution-Github-Action@v1
+      - uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: ${{ secrets.FIREBASE_APP_ID }}
           token: ${{ secrets.FIREBASE_TOKEN }}
