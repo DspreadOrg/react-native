@@ -40,7 +40,10 @@ jobs:
         run: |
           yarn install --frozen-lockfile
           cd android && ./gradlew dependencies
-
+          
+      - name: Grant Gradle permission
+        run: chmod +x android/gradlew
+        
       - name: Build Android APK
         run: |
           cd android
