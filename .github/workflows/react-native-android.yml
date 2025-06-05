@@ -11,46 +11,66 @@ env:
   JAVA_VERSION: 17
 
 jobs:
-  build:
-    name: Build APK
+  build-and-release:
+    name: Build and Release APK
     runs-on: ubuntu-latest
 
     steps:
+      # 1. 检出代码
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # 2. 设置JDK环境
       - name: Set up JDK ${{ env.JAVA_VERSION }}
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: ${{ env.JAVA_VERSION }}
 
+      # 3. 设置Node.js环境
       - name: Set up Node.js ${{ env.NODE_VERSION }}
         uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'yarn'
 
+      # 4. 清理和安装依赖
       - name: Clean conflicting lock files
-        run: rm -f package-lock.json  # 删除 npm 锁文件
+        run: rm -f package-lock.json
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Fix Gradle permissions  # 关键修复：在构建前设置权限
+      # 5. 修复Gradle权限
+      - name: Fix Gradle permissions
         run: chmod +x android/gradlew
 
+      # 6. 构建APK
       - name: Build Android APK
         run: |
           cd android
           ./gradlew assembleRelease --no-daemon --stacktrace
 
-      - name: Upload APK artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: app-release
-          path: android/app/build/outputs/apk/release/app-release.apk
-          
-      - name: Verify APK file in release
-        run: ls -R android/app/build/outputs/apk/release/app-release.apk  # 列出 APK 文件，确保路径正确
+      # 7. 验证APK文件
+      - name: Verify APK
+        run: |
+          if [ ! -f "android/app/build/outputs/apk/release/app-release.apk" ]; then
+            echo "::error::APK file not found!"
+            exit 1
+          fi
 
+      # 8. 创建Release并上传APK (新增的关键步骤)
+      - name: Create Release and Upload APK
+        if: github.ref == 'refs/heads/master'  # 只在推送到master时发布
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: release-$(date +%Y%m%d%H%M%S)  # 自动生成唯一标签
+          name: Production Release $(date +'%Y-%m-%d')
+          body: |
+            Automated release from GitHub Actions
+            Build Date: $(date)
+          files: |
+            android/app/build/outputs/apk/release/app-release.apk
+          draft: false  # 直接发布，设为true可先存为草稿
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 自动拥有权限
