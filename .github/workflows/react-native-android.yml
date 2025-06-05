@@ -50,5 +50,7 @@ jobs:
         with:
           name: app-release
           path: android/app/build/outputs/apk/release/app-release.apk
+          
+      - name: Verify APK file in release
+        run: ls -R android/app/build/outputs/apk/release/app-release.apk  # 列出 APK 文件，确保路径正确
 
- 
