@@ -60,17 +60,22 @@ jobs:
           fi
 
       # 8. 创建Release并上传APK (新增的关键步骤)
+
+      - name: Generate release tag
+        run: echo "RELEASE_TAG=release-$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
+
       - name: Create Release and Upload APK
-        if: github.ref == 'refs/heads/master'  # 只在推送到master时发布
+        if: github.ref == 'refs/heads/master'
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: release-$(date +%Y%m%d%H%M%S)  # 自动生成唯一标签
-          name: Production Release $(date +'%Y-%m-%d')
+          tag_name: ${{ env.RELEASE_TAG }}
+          name: Release ${{ env.RELEASE_TAG }}
           body: |
             Automated release from GitHub Actions
             Build Date: $(date)
           files: |
             android/app/build/outputs/apk/release/app-release.apk
-          draft: false  # 直接发布，设为true可先存为草稿
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # 自动拥有权限
+          draft: false
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}            
+                    
