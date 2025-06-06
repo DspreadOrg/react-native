@@ -40,6 +40,22 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
+        
+        # 关键修复：创建 assets 目录并生成 bundle
+      - name: Create assets directory
+        run: mkdir -p android/app/src/main/assets
+
+      - name: Generate React Native Bundle
+        run: |
+          npx react-native bundle \
+            --platform android \
+            --dev false \
+            --entry-file index.js \
+            --bundle-output android/app/src/main/assets/index.android.bundle \
+            --assets-dest android/app/src/main/res/
+
+      - name: Fix Gradle permissions
+        run: chmod +x android/gradlew
 
       # 5. 修复Gradle权限
       - name: Fix Gradle permissions
