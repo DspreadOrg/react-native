@@ -97,7 +97,7 @@ jobs:
           body: |
             Automated release from GitHub Actions
             Version: ${{ env.APP_VERSION }}
-            Build Date: $(date +'%Y-%m-%d %H:%M:%S')
+            
           files: |
             app-release-${{ env.APP_VERSION }}.apk
           draft: false
