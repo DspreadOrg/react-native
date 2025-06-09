@@ -40,8 +40,8 @@ jobs:
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
-        
-        # 关键修复：创建 assets 目录并生成 bundle
+
+      # 5. 生成 React Native Bundle
       - name: Create assets directory
         run: mkdir -p android/app/src/main/assets
 
@@ -54,44 +54,46 @@ jobs:
             --bundle-output android/app/src/main/assets/index.android.bundle \
             --assets-dest android/app/src/main/res/
 
+      # 6. 修复Gradle权限
       - name: Fix Gradle permissions
         run: chmod +x android/gradlew
 
-      # 5. 修复Gradle权限
-      - name: Fix Gradle permissions
-        run: chmod +x android/gradlew
+      # 7. 提取 Android 版本号（关键修改）
+      - name: Extract Android version
+        id: android-version
+        run: |
+          VERSION=$(grep 'versionName' android/app/build.gradle | cut -d '"' -f 2)
+          echo "ANDROID_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "APK_NAME=app-release-$VERSION.apk" >> $GITHUB_ENV  # 动态生成带版本号的APK文件名
 
-      # 6. 构建APK
+      # 8. 构建APK（关键修改：重命名文件）
       - name: Build Android APK
         run: |
           cd android
           ./gradlew assembleRelease --no-daemon --stacktrace
+          # 重命名APK文件，添加版本号
+          mv app/build/outputs/apk/release/app-release.apk ../app-release-${{ env.ANDROID_VERSION }}.apk
 
-      # 7. 验证APK文件
+      # 9. 验证APK文件
       - name: Verify APK
         run: |
-          if [ ! -f "android/app/build/outputs/apk/release/app-release.apk" ]; then
+          if [ ! -f "app-release-${{ env.ANDROID_VERSION }}.apk" ]; then
             echo "::error::APK file not found!"
             exit 1
           fi
 
-      # 8. 创建Release并上传APK (新增的关键步骤)
-
-      - name: Generate release tag
-        run: echo "RELEASE_TAG=release-$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
-
+      # 10. 创建Release并上传APK（关键修改：使用版本号）
       - name: Create Release and Upload APK
         if: github.ref == 'refs/heads/master'
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: ${{ env.RELEASE_TAG }}
-          name: Release ${{ env.RELEASE_TAG }}
+          tag_name: v${{ env.ANDROID_VERSION }}  # 使用语义化版本号作为Tag（如 v1.0.0）
+          name: Release v${{ env.ANDROID_VERSION }}
           body: |
             Automated release from GitHub Actions
-            Build Date: $(date)
+            Version: ${{ env.ANDROID_VERSION }}
           files: |
-            android/app/build/outputs/apk/release/app-release.apk
+            app-release-${{ env.ANDROID_VERSION }}.apk  # 上传带版本号的APK
           draft: false
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}            
-                    
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
