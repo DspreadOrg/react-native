@@ -34,14 +34,23 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'yarn'
 
-      # 4. 清理和安装依赖
+      # 4. 提取版本号（从package.json）
+      - name: Get version from package.json
+        id: package-version
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "APK_NAME=app-release-$VERSION.apk" >> $GITHUB_ENV
+          echo "APK_PATH=android/app/build/outputs/apk/release/app-release.apk" >> $GITHUB_ENV
+
+      # 5. 清理和安装依赖
       - name: Clean conflicting lock files
         run: rm -f package-lock.json
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      # 5. 生成 React Native Bundle
+      # 6. 生成 React Native Bundle
       - name: Create assets directory
         run: mkdir -p android/app/src/main/assets
 
@@ -54,46 +63,43 @@ jobs:
             --bundle-output android/app/src/main/assets/index.android.bundle \
             --assets-dest android/app/src/main/res/
 
-      # 6. 修复Gradle权限
+      # 7. 修复Gradle权限
       - name: Fix Gradle permissions
         run: chmod +x android/gradlew
 
-      # 7. 提取 Android 版本号（关键修改）
-      - name: Extract Android version
-        id: android-version
-        run: |
-          VERSION=$(grep 'versionName' android/app/build.gradle | cut -d '"' -f 2)
-          echo "ANDROID_VERSION=$VERSION" >> $GITHUB_ENV
-          echo "APK_NAME=app-release-$VERSION.apk" >> $GITHUB_ENV  # 动态生成带版本号的APK文件名
-
-      # 8. 构建APK（关键修改：重命名文件）
+      # 8. 构建APK
       - name: Build Android APK
         run: |
           cd android
           ./gradlew assembleRelease --no-daemon --stacktrace
-          # 重命名APK文件，添加版本号
-          mv app/build/outputs/apk/release/app-release.apk ../app-release-${{ env.ANDROID_VERSION }}.apk
 
-      # 9. 验证APK文件
+      # 9. 重命名APK文件（带版本号）
+      - name: Rename APK with version
+        run: |
+          mv ${{ env.APK_PATH }} ./app-release-${{ env.APP_VERSION }}.apk
+
+      # 10. 验证APK文件
       - name: Verify APK
         run: |
-          if [ ! -f "app-release-${{ env.ANDROID_VERSION }}.apk" ]; then
+          if [ ! -f "app-release-${{ env.APP_VERSION }}.apk" ]; then
             echo "::error::APK file not found!"
+            ls -R android/app/build/outputs/apk/  # 打印目录结构用于调试
             exit 1
           fi
 
-      # 10. 创建Release并上传APK（关键修改：使用版本号）
+      # 11. 创建Release并上传APK
       - name: Create Release and Upload APK
         if: github.ref == 'refs/heads/master'
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ env.ANDROID_VERSION }}  # 使用语义化版本号作为Tag（如 v1.0.0）
-          name: Release v${{ env.ANDROID_VERSION }}
+          tag_name: v${{ env.APP_VERSION }}  # 使用package.json版本号作为Tag
+          name: Release v${{ env.APP_VERSION }}
           body: |
             Automated release from GitHub Actions
-            Version: ${{ env.ANDROID_VERSION }}
+            Version: ${{ env.APP_VERSION }}
+            Build Date: $(date +'%Y-%m-%d %H:%M:%S')
           files: |
-            app-release-${{ env.ANDROID_VERSION }}.apk  # 上传带版本号的APK
+            app-release-${{ env.APP_VERSION }}.apk
           draft: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
