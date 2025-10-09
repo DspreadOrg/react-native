@@ -17,6 +17,7 @@ public class Package implements ReactPackage {
     public List<NativeModule> createNativeModules(@NonNull ReactApplicationContext reactContext) {
         List<NativeModule> modules = new ArrayList();
         modules.add(new NativePosModule(reactContext));
+        modules.add(new NativePosPrintModule(reactContext));
         return modules;
     }
 

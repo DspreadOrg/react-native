@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Text, TextInput, View, NativeEventEmitter,NativeModules,Button, StyleSheet,DeviceEventEmitter,FlatList, TouchableOpacity, string, ScrollView, Title, Alert, prompt} from 'react-native';
 var pos = NativeModules.NativePosModule;
+var posprint = NativeModules.NativePosPrintModule;
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 const NativePosEmitter = new NativeEventEmitter(pos);
 
@@ -127,6 +128,9 @@ export default class catComponent extends Component {
                     </TouchableOpacity>
                     <TouchableOpacity onPress={this.updateEMVConfigByXML} style = {this.styles.button}>
                       <Text style={this.styles.text}>updateEMVConfigByXML</Text>
+                    </TouchableOpacity>
+                     <TouchableOpacity onPress={this.printTicket} style = {this.styles.button}>
+                      <Text style={this.styles.text}>Print</Text>
                     </TouchableOpacity>
                     <Text style = {this.styles.textStyle}>Bluetooth Name</Text>        
                  </View>
@@ -299,6 +303,10 @@ export default class catComponent extends Component {
       this.setState({
         transactionData : message
       });
+    }else if(msg.method == "printResult"){
+     this.setState({
+            transactionData : message
+          });
     }else{
       this.setState({
         transactionData : message
@@ -320,7 +328,7 @@ export default class catComponent extends Component {
       this.setState({
            bluetoothName : []
       });
-      pos.initPos(communicationMode[0]);
+      pos.initPos(communicationMode[2]);
       console.log("scanBluetooth");
       pos.scanQPos2Mode(10);
    }
@@ -368,7 +376,10 @@ export default class catComponent extends Component {
       console.error('Error reading XML file:', error);
     });
  }
-
+ printTicket(msg){
+  posprint.initPrint();
+  posprint.printTicket();
+ }
  updateEMVConfigByTlv(msg) {
   /*
   update contactless cvm limit:
