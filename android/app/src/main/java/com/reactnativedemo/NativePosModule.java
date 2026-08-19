@@ -134,7 +134,7 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         TRACE.d("open");
         //pos=null;
         listener = new MyQposClass();
-        pos = QPOSService.getInstance(context,mode);
+        pos = QPOSService.getInstance(context, mode);
         if (pos == null) {
             Log.w("open", "CommunicationMode unknow");
             return;
@@ -171,10 +171,12 @@ public class NativePosModule extends ReactContextBaseJavaModule {
     public void disconnectBT() {
         pos.disconnectBT();
     }
+
     @ReactMethod
-    public void closeUart(){
+    public void closeUart() {
         pos.closeUart();
     }
+
     @ReactMethod
     public void doTrade(int keyIdex, int timeOut) {
         pos.doTrade(keyIdex, timeOut);
@@ -186,7 +188,7 @@ public class NativePosModule extends ReactContextBaseJavaModule {
     }
 
     @ReactMethod
-    public void setAmount(String amount, String cashbackAmount, String currencyCode,String transactionType) {
+    public void setAmount(String amount, String cashbackAmount, String currencyCode, String transactionType) {
         Log.w("setAmount", "goods==" + transactionType);
 //        QPOSService.TransactionType transactionType = QPOSService.TransactionType.GOODS;
 //        if (transactionTypeString.equals("GOODS")) {
@@ -263,7 +265,7 @@ public class NativePosModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public Hashtable getICCTag(int encryType, int cardType, int tagCount, String tagArrStr) {
-       return pos.getICCTag(QPOSService.EncryptType.values()[encryType],cardType,tagCount,tagArrStr);
+        return pos.getICCTag(QPOSService.EncryptType.values()[encryType], cardType, tagCount, tagArrStr);
     }
 
     @ReactMethod
@@ -288,12 +290,12 @@ public class NativePosModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void updateEmvAPPByTlv(int operationType, String appTlv) {
-        pos.updateEmvAPPByTlv(QPOSService.EMVDataOperation.values()[operationType],appTlv);
+        pos.updateEmvAPPByTlv(QPOSService.EMVDataOperation.values()[operationType], appTlv);
     }
 
     @ReactMethod
     public void updateEmvCAPKByTlv(int operationType, String capkTlv) {
-        pos.updateEmvCAPKByTlv(QPOSService.EMVDataOperation.values()[operationType],capkTlv);
+        pos.updateEmvCAPKByTlv(QPOSService.EMVDataOperation.values()[operationType], capkTlv);
     }
 
     class MyQposClass extends CQPOSService {
@@ -311,17 +313,18 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         public void onDoTradeResult(QPOSService.DoTradeResult result, Hashtable<String, String> decodeData) {
             TRACE.d("(DoTradeResult result, Hashtable<String, String> decodeData) " + result.toString() + TRACE.NEW_LINE + "decodeData:" + decodeData);
             String content = "";
-            if (result == QPOSService.DoTradeResult.NONE) {
+          /*  if (result == QPOSService.DoTradeResult.NONE) {
                 content = context.getString(R.string.no_card_detected);
-            } else if (result == QPOSService.DoTradeResult.ICC) {
+            } else */
+            if (result == QPOSService.DoTradeResult.ICC) {
 //                pos.doEmvApp(QPOSService.EmvOption.START);
-            } else if (result == QPOSService.DoTradeResult.NOT_ICC) {
+            }/* else if (result == QPOSService.DoTradeResult.NOT_ICC) {
                 content = context.getString(R.string.card_inserted);
-            } else if (result == QPOSService.DoTradeResult.BAD_SWIPE) {
+            }*//* else if (result == QPOSService.DoTradeResult.BAD_SWIPE) {
                 content = context.getString(R.string.bad_swipe);
-            } else if (result == QPOSService.DoTradeResult.CARD_NOT_SUPPORT) {
+            }*/ /*else if (result == QPOSService.DoTradeResult.CARD_NOT_SUPPORT) {
                 content = "GPO NOT SUPPORT";
-            } else if (result == QPOSService.DoTradeResult.PLS_SEE_PHONE) {
+            }*/ else if (result == QPOSService.DoTradeResult.PLS_SEE_PHONE) {
                 content = "PLS SEE PHONE";
             } else if (result == QPOSService.DoTradeResult.MCR) {//磁条卡
                 content = context.getString(R.string.card_swiped);
@@ -512,10 +515,10 @@ public class NativePosModule extends ReactContextBaseJavaModule {
                 }
             } else if ((result == QPOSService.DoTradeResult.NFC_DECLINED)) {
                 content += context.getString(R.string.transaction_declined);
-            } else if (result == QPOSService.DoTradeResult.NO_RESPONSE) {
+            }/* else if (result == QPOSService.DoTradeResult.NO_RESPONSE) {
                 content += context.getString(R.string.card_no_response);
-            }
-            sendMsg("onDoTradeResult", "DoTradeResult_"+result.toString(),JSONObject.toJSONString(decodeData));
+            }*/
+            sendMsg("onDoTradeResult", "DoTradeResult_" + result.toString(), JSONObject.toJSONString(decodeData));
         }
 
         @Override
@@ -554,7 +557,7 @@ public class NativePosModule extends ReactContextBaseJavaModule {
             content += context.getString(R.string.track_3_supported) + isSupportedTrack3 + "\n";
             content += "PCI FirmwareVresion:" + pciFirmwareVersion + "\n";
             content += "PCI HardwareVersion:" + pciHardwareVersion + "\n";
-            sendMsg("onQposInfoResult", "",JSONObject.toJSONString(posInfoData));
+            sendMsg("onQposInfoResult", "", JSONObject.toJSONString(posInfoData));
         }
 
         /**
@@ -564,7 +567,7 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         public void onRequestTransactionResult(QPOSService.TransactionResult transactionResult) {
             TRACE.d("onRequestTransactionResult()" + transactionResult.toString());
 //            if (transactionResult != QPOSService.TransactionResult.APPROVED) {
-                sendMsg("onRequestTransactionResult", "TransactionResult_"+transactionResult.toString());
+            sendMsg("onRequestTransactionResult", "TransactionResult_" + transactionResult.toString());
 //            }
         }
 
@@ -572,7 +575,7 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         public void onRequestBatchData(String tlv) {
             TRACE.d("ICC trade finished");
             TRACE.d("onRequestBatchData(String tlv):" + tlv);
-            sendMsg("onRequestBatchData", "",tlv);
+            sendMsg("onRequestBatchData", "", tlv);
         }
 
         @Override
@@ -592,9 +595,9 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         }
 
         @Override
-        public void onReturnGetPinInputResult(int num) {
+        public void onReturnGetPinInputResult(int num, QPOSService.PinError error, int minLen, int maxLen) {
 //            super.onReturnGetPinInputResult(num);
-            runOnUiThread(() ->{
+            runOnUiThread(() -> {
                 String s = "";
                 if (num == -1) {
                     if (keyboardUtil != null) {
@@ -604,7 +607,9 @@ public class NativePosModule extends ReactContextBaseJavaModule {
                     for (int i = 0; i < num; i++) {
                         s += "*";
                     }
-                    KeyboardUtil.pinpadEditText.setText(s);
+                    if(keyboardUtil.pinpadEditText!=null){
+                        keyboardUtil.pinpadEditText.setText(s);
+                    }
                 }
             });
         }
@@ -629,13 +634,13 @@ public class NativePosModule extends ReactContextBaseJavaModule {
             content += "conn: " + pos.getBluetoothState() + "\n";
             content += "psamId: " + psamId + "\n";
             content += "NFCId: " + NFCId + "\n";
-            sendMsg("onQposIdResult", "",JSONObject.toJSONString(posIdTable));
+            sendMsg("onQposIdResult", "", JSONObject.toJSONString(posIdTable));
         }
 
         @Override
         public void onRequestSelectEmvApp(ArrayList<String> appList) {
             TRACE.d("onRequestSelectEmvApp():" + appList.toString());
-            sendMsg("onRequestSelectEmvApp","",JSONObject.toJSONString(appList));
+            sendMsg("onRequestSelectEmvApp", "", JSONObject.toJSONString(appList));
 //            Dialog dialog = new Dialog(getCurrentActivity());
 //            dialog.setContentView(R.layout.emv_app_dialog);
 //            dialog.setTitle(R.string.please_select_app);
@@ -694,9 +699,10 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         public void onRequestDisplay(QPOSService.Display displayMsg) {
             TRACE.d("onRequestDisplay(Display displayMsg):" + displayMsg.toString());
             String msg = "";
-            if (displayMsg == QPOSService.Display.CLEAR_DISPLAY_MSG) {
+           /* if (displayMsg == QPOSService.Display.CLEAR_DISPLAY_MSG) {
                 msg = "";
-            } else if (displayMsg == QPOSService.Display.MSR_DATA_READY) {
+            }*/
+            if (displayMsg == QPOSService.Display.MSR_DATA_READY) {
 //            AlertDialog.Builder builder = new AlertDialog.Builder(BluetoothActivity.this);
 //            builder.setTitle("Audio");
 //            builder.setMessage("Success,Contine ready");
@@ -706,9 +712,9 @@ public class NativePosModule extends ReactContextBaseJavaModule {
 //            msg = getString(R.string.wait);
             } else if (displayMsg == QPOSService.Display.REMOVE_CARD) {
 //            msg = getString(R.string.remove_card);
-            } else if (displayMsg == QPOSService.Display.TRY_ANOTHER_INTERFACE) {
+            }/* else if (displayMsg == QPOSService.Display.TRY_ANOTHER_INTERFACE) {
                 msg = context.getString(R.string.try_another_interface);
-            } else if (displayMsg == QPOSService.Display.PROCESSING) {
+            }*/ else if (displayMsg == QPOSService.Display.PROCESSING) {
 //            msg = getString(R.string.processing);
             } else if (displayMsg == QPOSService.Display.INPUT_PIN_ING) {
                 msg = "please input pin on pos";
@@ -718,10 +724,10 @@ public class NativePosModule extends ReactContextBaseJavaModule {
 
             } else if (displayMsg == QPOSService.Display.MAG_TO_ICC_TRADE) {
                 msg = "please insert chip card on pos";
-            } else if (displayMsg == QPOSService.Display.CARD_REMOVED) {
+            } /*else if (displayMsg == QPOSService.Display.CARD_REMOVED) {
                 msg = "card removed";
-            }
-            sendMsg("onRequestDisplay", "Display_"+displayMsg.toString());
+            }*/
+            sendMsg("onRequestDisplay", "Display_" + displayMsg.toString());
         }
 
         @Override
@@ -783,13 +789,13 @@ public class NativePosModule extends ReactContextBaseJavaModule {
 //                content = context.getString(R.string.cmd_timeout);
 //            } else if (errorState == QPOSService.Error.ICC_ONLINE_TIMEOUT) {
 //            }
-            sendMsg("onError", "Error_"+errorState.toString());
+            sendMsg("onError", "Error_" + errorState.toString());
         }
 
         @Override
         public void onReturnReversalData(String tlv) {
             TRACE.d("onReturnReversalData(): " + tlv);
-            sendMsg("onReturnReversalData", "",tlv);
+            sendMsg("onReturnReversalData", "", tlv);
         }
 
         @Override
@@ -799,7 +805,7 @@ public class NativePosModule extends ReactContextBaseJavaModule {
             String pinKsn = result.get("pinKsn");
             String content = "get pin result\n";
             TRACE.i(content);
-            sendMsg("onReturnGetPinResult", "",JSONObject.toJSONString(result));
+            sendMsg("onReturnGetPinResult", "", JSONObject.toJSONString(result));
         }
 
         @Override
@@ -868,7 +874,7 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         @Override
         public void onReturnCustomConfigResult(boolean isSuccess, String result) {
             TRACE.d("onReturnCustomConfigResult(boolean isSuccess, String result):" + isSuccess + TRACE.NEW_LINE + result);
-            sendMsg("onReturnCustomConfigResult", isSuccess? "Success":"Fail");
+            sendMsg("onReturnCustomConfigResult", isSuccess ? "Success" : "Fail");
         }
 
         @Override
@@ -880,7 +886,7 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         @Override
         public void onReturnSetMasterKeyResult(boolean isSuccess) {
             TRACE.d("onReturnSetMasterKeyResult(boolean isSuccess) : " + isSuccess);
-            sendMsg("onReturnSetMasterKeyResult", isSuccess? "Success":"Fail");
+            sendMsg("onReturnSetMasterKeyResult", isSuccess ? "Success" : "Fail");
         }
 
         @Override
@@ -896,25 +902,25 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         @Override
         public void onBluetoothBondFailed() {
             TRACE.d("onBluetoothBondFailed()");
-            sendMsg("onBluetoothBondFailed","");
+            sendMsg("onBluetoothBondFailed", "");
         }
 
         @Override
         public void onBluetoothBondTimeout() {
             TRACE.d("onBluetoothBondTimeout()");
-            sendMsg("onBluetoothBondTimeout","");
+            sendMsg("onBluetoothBondTimeout", "");
         }
 
         @Override
         public void onBluetoothBonded() {
             TRACE.d("onBluetoothBonded()");
-            sendMsg("onBluetoothBonded","");
+            sendMsg("onBluetoothBonded", "");
         }
 
         @Override
         public void onBluetoothBonding() {
             TRACE.d("onBluetoothBonding()");
-            sendMsg("onBluetoothBonding","");
+            sendMsg("onBluetoothBonding", "");
         }
 
         @Override
@@ -923,13 +929,13 @@ public class NativePosModule extends ReactContextBaseJavaModule {
             String s = "serviceCode: " + result.get("serviceCode");
             s += "\n";
             s += "trackblock: " + result.get("trackblock");
-            sendMsg("onReturniccCashBack","",JSONObject.toJSONString(result));
+            sendMsg("onReturniccCashBack", "", JSONObject.toJSONString(result));
         }
 
         @Override
         public void onLcdShowCustomDisplay(boolean arg0) {
             TRACE.d("onLcdShowCustomDisplay(boolean arg0):" + arg0);
-            sendMsg("onLcdShowCustomDisplay", arg0? "Success":"Fail");
+            sendMsg("onLcdShowCustomDisplay", arg0 ? "Success" : "Fail");
         }
 
         @Override
@@ -969,13 +975,13 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         @Override
         public void onUpdateMasterKeyResult(boolean arg0, Hashtable<String, String> arg1) {
             TRACE.d("onUpdateMasterKeyResult(boolean arg0, Hashtable<String, String> arg1):" + arg0 + TRACE.NEW_LINE + arg1.toString());
-            sendMsg("onUpdateMasterKeyResult", arg0? "Success":"Fail",JSONObject.toJSONString(arg1));
+            sendMsg("onUpdateMasterKeyResult", arg0 ? "Success" : "Fail", JSONObject.toJSONString(arg1));
         }
 
         @Override
         public void onEmvICCExceptionData(String arg0) {
             TRACE.d("onEmvICCExceptionData(String arg0):" + arg0);
-            sendMsg("onEmvICCExceptionData", "",arg0);
+            sendMsg("onEmvICCExceptionData", "", arg0);
         }
 
         @Override
@@ -996,11 +1002,6 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         @Override
         public void onReturnPowerOffNFCResult(boolean arg0) {
             TRACE.d(" onReturnPowerOffNFCResult(boolean arg0) :" + arg0);
-        }
-
-        @Override
-        public void onReturnPowerOnNFCResult(boolean arg0, String arg1, String arg2, int arg3) {
-            TRACE.d("onReturnPowerOnNFCResult(boolean arg0, String arg1, String arg2, int arg3):" + arg0 + TRACE.NEW_LINE + arg1 + TRACE.NEW_LINE + arg2 + TRACE.NEW_LINE + arg3);
         }
 
         @Override
@@ -1026,21 +1027,6 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         @Override
         public void onQposIsCardExist(boolean cardIsExist) {
             TRACE.d("onQposIsCardExist(boolean cardIsExist):" + cardIsExist);
-        }
-
-        @Override
-        public void onSearchMifareCardResult(Hashtable<String, String> arg0) {
-            if (arg0 != null) {
-                TRACE.d("onSearchMifareCardResult(Hashtable<String, String> arg0):" + arg0.toString());
-                String statuString = arg0.get("status");
-                String cardTypeString = arg0.get("cardType");
-                String cardUidLen = arg0.get("cardUidLen");
-                String cardUid = arg0.get("cardUid");
-                String cardAtsLen = arg0.get("cardAtsLen");
-                String cardAts = arg0.get("cardAts");
-                String ATQA = arg0.get("ATQA");
-                String SAK = arg0.get("SAK");
-            }
         }
 
         @Override
@@ -1085,19 +1071,19 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         @Override
         public void onReturnUpdateIPEKResult(boolean arg0) {
             TRACE.d("onReturnUpdateIPEKResult(boolean arg0):" + arg0);
-            sendMsg("onReturnUpdateIPEKResult",arg0? "Success":"Fail");
+            sendMsg("onReturnUpdateIPEKResult", arg0 ? "Success" : "Fail");
         }
 
         @Override
         public void onReturnUpdateEMVRIDResult(boolean arg0) {
             TRACE.d("onReturnUpdateEMVRIDResult(boolean arg0):" + arg0);
-            sendMsg("onReturnUpdateEMVRIDResult",arg0? "Success":"Fail");
+            sendMsg("onReturnUpdateEMVRIDResult", arg0 ? "Success" : "Fail");
         }
 
         @Override
         public void onReturnUpdateEMVResult(boolean arg0) {
             TRACE.d("onReturnUpdateEMVResult(boolean arg0):" + arg0);
-            sendMsg("onReturnUpdateEMVResult",arg0? "Success":"Fail");
+            sendMsg("onReturnUpdateEMVResult", arg0 ? "Success" : "Fail");
         }
 
         @Override
@@ -1118,12 +1104,12 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         @Override
         public void onSetSleepModeTime(boolean arg0) {
             TRACE.d("onSetSleepModeTime(boolean arg0):" + arg0);
-            sendMsg("onSetSleepModeTime",arg0? "Success":"Fail");
+            sendMsg("onSetSleepModeTime", arg0 ? "Success" : "Fail");
         }
 
         @Override
         public void onReturnGetEMVListResult(String arg0) {
-            sendMsg("onReturnGetEMVListResult",arg0);
+            sendMsg("onReturnGetEMVListResult", arg0);
         }
 
         @Override
@@ -1139,7 +1125,7 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         @Override
         public void onRequestUpdateKey(String arg0) {
             TRACE.d("onRequestUpdateKey(String arg0):" + arg0);
-            sendMsg("onRequestUpdateKey","",arg0);
+            sendMsg("onRequestUpdateKey", "", arg0);
         }
 
         @Override
@@ -1189,14 +1175,14 @@ public class NativePosModule extends ReactContextBaseJavaModule {
             String m = clearKeys.get("modulus");
             String e = clearKeys.get("exponent");
 //            statusEditText.setText(m.length()+"  "+m+"\n"+e);
-            sendMsg("onQposInfoResult", "",JSONObject.toJSONString(m.length()+"  "+m+"\n"+e));
+            sendMsg("onQposInfoResult", "", JSONObject.toJSONString(m.length() + "  " + m + "\n" + e));
 
         }
 
         @Override
         public void onTradeCancelled() {
             TRACE.d("onTradeCancelled");
-            sendMsg("onTradeCancelled","");
+            sendMsg("onTradeCancelled", "");
         }
 
         @Override
@@ -1211,15 +1197,6 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         public void onReturnConverEncryptedBlockFormat(String result) {
         }
 
-        @Override
-        public void onFinishMifareCardResult(boolean arg0) {
-            TRACE.d("onFinishMifareCardResult(boolean arg0):" + arg0);
-        }
-
-        @Override
-        public void onVerifyMifareCardResult(boolean arg0) {
-            TRACE.d("onVerifyMifareCardResult(boolean arg0):" + arg0);
-        }
 
         @Override
         public void onReadMifareCardResult(Hashtable<String, String> arg0) {
@@ -1231,10 +1208,6 @@ public class NativePosModule extends ReactContextBaseJavaModule {
             }
         }
 
-        @Override
-        public void onWriteMifareCardResult(boolean arg0) {
-            TRACE.d("onWriteMifareCardResult(boolean arg0):" + arg0);
-        }
 
         @Override
         public void onOperateMifareCardResult(Hashtable<String, String> arg0) {
@@ -1344,12 +1317,11 @@ public class NativePosModule extends ReactContextBaseJavaModule {
     }
 
 
-
     private void sendMsg(String key, String result) {
-        sendMsg(key,result,"");
+        sendMsg(key, result, "");
     }
 
-    private void sendMsg(String key, String result,String data) {
+    private void sendMsg(String key, String result, String data) {
         Log.w("sendMsg", "sendMsg==" + key);
         WritableMap params = Arguments.createMap();
         params.putString("method", key);
@@ -1367,13 +1339,16 @@ public class NativePosModule extends ReactContextBaseJavaModule {
                 .emit(eventName, params);
 
     }
+
     private LocationManager lm;//【位置管理】
     private static final int BLUETOOTH_CODE = 100;
     private static final int LOCATION_CODE = 101;
+
     public void bluetoothRelaPer() {
         android.bluetooth.BluetoothAdapter adapter = android.bluetooth.BluetoothAdapter.getDefaultAdapter();
         if (adapter != null && !adapter.isEnabled()) {//if bluetooth is disabled, add one fix
             Intent enabler = new Intent(android.bluetooth.BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            enabler.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(enabler);
         }
         lm = (LocationManager) context.getSystemService(LOCATION_SERVICE);
