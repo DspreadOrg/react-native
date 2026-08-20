@@ -5,8 +5,10 @@ import static android.content.Context.LOCATION_SERVICE;
 import static com.facebook.react.bridge.UiThreadUtil.runOnUiThread;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -32,10 +34,12 @@ import androidx.core.content.ContextCompat;
 import com.dspread.xpos.CQPOSService;
 import com.dspread.xpos.QPOSService;
 import com.facebook.react.bridge.Arguments;
+import com.facebook.react.bridge.BaseActivityEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
+import com.facebook.react.module.annotations.ReactModule;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 import com.reactnativedemo.keyboard.keyboard.KeyBoardNumInterface;
@@ -55,7 +59,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+@ReactModule(name = NativePosModule.NAME)
 public class NativePosModule extends ReactContextBaseJavaModule {
+    public static final String NAME = "NativePosModule";
+    private static final String TAG = "NativePosModule";
     public ReactApplicationContext reactApplicationContext;
     public Context context;
     private QPOSService pos;
@@ -63,19 +70,65 @@ public class NativePosModule extends ReactContextBaseJavaModule {
     private KeyboardUtil keyboardUtil;
     private List<String> keyBoardList = new ArrayList<>();
 
+    private boolean pendingScan = false;
+    private int pendingScanTime = -1;
+    private static final int REQUEST_BT_ENABLE = 200;
+
+    private final BaseActivityEventListener activityEventListener = new BaseActivityEventListener() {
+        @Override
+        public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
+            Log.w(TAG, "onActivityResult: requestCode=" + requestCode + ", resultCode=" + resultCode + ", pendingScan=" + pendingScan);
+            if (requestCode == REQUEST_BT_ENABLE && pendingScan) {
+                Log.w(TAG, "onActivityResult: bluetooth enable result received, retrying scan");
+                checkPermissionAndScan();
+            }
+        }
+    };
+
     public NativePosModule(ReactApplicationContext applicationContext) {
         super(applicationContext);
         this.reactApplicationContext = applicationContext;
         context = applicationContext;
+        applicationContext.addActivityEventListener(activityEventListener);
+        Log.w(TAG, "NativePosModule constructed, activityEventListener registered");
+    }
+
+    public void onBluetoothPermissionResult(int requestCode, String[] permissions, int[] grantResults) {
+        Log.w(TAG, "onBluetoothPermissionResult: requestCode=" + requestCode
+                + ", permissions=" + (permissions == null ? "null" : java.util.Arrays.toString(permissions))
+                + ", grantResults=" + (grantResults == null ? "null" : java.util.Arrays.toString(grantResults))
+                + ", pendingScan=" + pendingScan);
+        if (!pendingScan) {
+            Log.w(TAG, "onBluetoothPermissionResult: no pending scan, ignore");
+            return;
+        }
+        boolean allGranted = grantResults != null && grantResults.length > 0;
+        if (allGranted) {
+            for (int r : grantResults) {
+                if (r != PackageManager.PERMISSION_GRANTED) {
+                    allGranted = false;
+                    break;
+                }
+            }
+        }
+        Log.w(TAG, "onBluetoothPermissionResult: allGranted=" + allGranted);
+        if (allGranted) {
+            Log.w(TAG, "onBluetoothPermissionResult: permissions granted, retrying scan");
+            checkPermissionAndScan();
+        } else {
+            pendingScan = false;
+            Log.w(TAG, "onBluetoothPermissionResult: permissions DENIED, aborting scan");
+            sendMsg("scanQPos2Mode", "error", "bluetooth permissions denied");
+        }
     }
 
     @NonNull
     @Override
     public String getName() {
-        return "NativePosModule";
+        return NAME;
     }
 
-    //表示react native和android有相同module时，返回true表示允许覆盖
+    //表示react native和android有相同module时，返回true表示允许覆盖。
     @Override
     public boolean canOverrideExistingModule() {
         return true;
@@ -83,9 +136,8 @@ public class NativePosModule extends ReactContextBaseJavaModule {
 
     @ReactMethod
     public void initPos(String mode) {
-        Log.w("initPos", "mode==" + mode);
+        Log.w(TAG, "initPos: mode=" + mode + ", current pos=" + (pos == null ? "null" : "not null"));
         if ("BLUETOOTH".equals(mode)) {
-            bluetoothRelaPer();
             open(QPOSService.CommunicationMode.BLUETOOTH);
         } else if ("UART".equals(mode)) {
             open(QPOSService.CommunicationMode.UART);
@@ -118,10 +170,43 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         }
     }
 
+    private void checkPermissionAndScan() {
+        Log.w(TAG, "checkPermissionAndScan: pendingScan=" + pendingScan + ", pos=" + (pos == null ? "null" : "ready"));
+        if (!pendingScan) {
+            return;
+        }
+        if (pos == null) {
+            Log.w(TAG, "checkPermissionAndScan: pos is null, cannot scan");
+            pendingScan = false;
+            sendMsg("scanQPos2Mode", "error", "pos is null, please call initPos first");
+            return;
+        }
+        Log.w(TAG, "checkPermissionAndScan: checking bluetooth permissions");
+        if (checkAndRequestBluetoothPermissions()) {
+            Log.w(TAG, "checkPermissionAndScan: permissions OK, calling pos.scanQPos2Mode, time=" + pendingScanTime);
+            pendingScan = false;
+            pos.scanQPos2Mode(context, pendingScanTime);
+        } else {
+            Log.w(TAG, "checkPermissionAndScan: permissions/bluetooth not ready, waiting for callback");
+        }
+    }
+
     @ReactMethod
     public void scanQPos2Mode(int time) {
-        pos.scanQPos2Mode(context, 20);
-        Log.w("scanQPos2Mode", "scanQPos2Mode=" + time);
+        Log.w(TAG, "scanQPos2Mode: time=" + time + ", pos=" + (pos == null ? "null" : "ready"));
+        pendingScanTime = time;
+        pendingScan = true;
+        if (pos == null) {
+            Log.w(TAG, "scanQPos2Mode: pos is null, initializing BLUETOOTH mode");
+            open(QPOSService.CommunicationMode.BLUETOOTH);
+            if (pos == null) {
+                Log.w(TAG, "scanQPos2Mode: open failed, pos still null");
+                pendingScan = false;
+                sendMsg("scanQPos2Mode", "error", "pos init failed");
+                return;
+            }
+        }
+        checkPermissionAndScan();
     }
 
     @ReactMethod
@@ -132,13 +217,16 @@ public class NativePosModule extends ReactContextBaseJavaModule {
 
     private void open(QPOSService.CommunicationMode mode) {
         TRACE.d("open");
+        Log.w(TAG, "open: mode=" + mode);
         //pos=null;
         listener = new MyQposClass();
         pos = QPOSService.getInstance(context, mode);
         if (pos == null) {
-            Log.w("open", "CommunicationMode unknow");
+            Log.w(TAG, "open: QPOSService.getInstance returned null for mode=" + mode);
+            sendMsg("initPos", "error", "CommunicationMode unknown");
             return;
         }
+        Log.w(TAG, "open: QPOSService instance created, pos=" + pos);
         if (mode == QPOSService.CommunicationMode.USB_OTG_CDC_ACM) {
             pos.setUsbSerialDriver(QPOSService.UsbOTGDriver.CDCACM);
         }
@@ -148,6 +236,7 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         Handler handler = new Handler(Looper.myLooper());
 //        pos.initListener(handler, listener);
         pos.initListener(listener);
+        Log.w(TAG, "open: initListener done, pos is ready");
     }
 
     @ReactMethod
@@ -1373,5 +1462,56 @@ public class NativePosModule extends ReactContextBaseJavaModule {
             Toast.makeText(context, "System detects that the GPS location service is not turned on", Toast.LENGTH_SHORT).show();
 
         }
+    }
+
+
+
+    private boolean checkAndRequestBluetoothPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            // Android 12+ 需要新的蓝牙权限
+            boolean bluetoothScanGranted = ContextCompat.checkSelfPermission(context, android.Manifest.permission.BLUETOOTH_SCAN) == PackageManager.PERMISSION_GRANTED;
+            boolean bluetoothConnectGranted = ContextCompat.checkSelfPermission(context, android.Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED;
+            boolean fineLocationGranted = ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+
+            if (!bluetoothScanGranted || !bluetoothConnectGranted || !fineLocationGranted) {
+                String[] permissions = new String[]{
+                        android.Manifest.permission.BLUETOOTH_SCAN,
+                        android.Manifest.permission.BLUETOOTH_CONNECT,
+                        android.Manifest.permission.ACCESS_FINE_LOCATION
+                };
+                ActivityCompat.requestPermissions(getCurrentActivity(), permissions, 102);
+                return false;
+            }
+        } else {
+            // Android 12 以下需要位置权限
+            boolean coarseLocationGranted = ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+            boolean fineLocationGranted = ContextCompat.checkSelfPermission(context, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+
+            if (!coarseLocationGranted || !fineLocationGranted) {
+                String[] permissions = new String[]{
+                        android.Manifest.permission.ACCESS_COARSE_LOCATION,
+                        android.Manifest.permission.ACCESS_FINE_LOCATION
+                };
+                ActivityCompat.requestPermissions(getCurrentActivity(), permissions, 102);
+                return false;
+            }
+        }
+
+        // 检查蓝牙是否开启
+        BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+        if (bluetoothAdapter == null || !bluetoothAdapter.isEnabled()) {
+            Toast.makeText(context, "please open bluetooth", Toast.LENGTH_LONG).show();
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            Activity activity = getCurrentActivity();
+            if (activity != null) {
+                activity.startActivityForResult(enableBtIntent, REQUEST_BT_ENABLE);
+            } else {
+                enableBtIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                context.startActivity(enableBtIntent);
+            }
+            return false;
+        }
+
+        return true;
     }
 }

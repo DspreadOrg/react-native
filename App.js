@@ -108,7 +108,7 @@ export default class catComponent extends Component {
             <FlatList
             ListHeaderComponent={
                 <View>
-                    <TouchableOpacity onPress={this.scanBluetooth.bind(this)} style = {this.styles.button}>
+                    <TouchableOpacity onPress={this.scanBluetooth.bind(this, communicationMode[2])} style = {this.styles.button}>
                       <Text style={this.styles.text}>Scan Bluetooth</Text>
                     </TouchableOpacity>  
                     <TouchableOpacity onPress={this.doTrade} style = {this.styles.button}>
@@ -324,13 +324,15 @@ export default class catComponent extends Component {
   /**
    * RN调用Native且通过Callback回调 通信方式
    */
-   scanBluetooth(msg) {
+   scanBluetooth(mode) {
       this.setState({
            bluetoothName : []
       });
-      pos.initPos(communicationMode[2]);
+      pos.initPos(mode);
       console.log("scanBluetooth");
-      pos.scanQPos2Mode(10);
+      if (mode !== communicationMode[2]) {
+         pos.scanQPos2Mode(10);
+      }
    }
 
    doTrade(msg) {
