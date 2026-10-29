@@ -1,6 +1,6 @@
 {
   "name": "reactnativedemo",
-  "version": "8.5.3",
+  "version": "8.6.1",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
