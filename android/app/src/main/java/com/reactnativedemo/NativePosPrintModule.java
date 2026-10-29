@@ -97,8 +97,8 @@ public class NativePosPrintModule extends ReactContextBaseJavaModule {
         params.putString("data", data);
         sendEvent(getReactApplicationContext(), "NativePosReminder", params);
     }
-    @ReactMethod
-    public void sendEvent(ReactContext reactContext,
+    // 仅供模块内部发送事件使用,不暴露给 JS(新架构 interop 不支持 ReactContext 参数)
+    private void sendEvent(ReactContext reactContext,
                           String eventName,
                           @Nullable WritableMap params) {
         reactContext

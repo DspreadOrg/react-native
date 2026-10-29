@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Text, TextInput, View, NativeEventEmitter,NativeModules,Button, StyleSheet,DeviceEventEmitter,FlatList, TouchableOpacity, string, ScrollView, Title, Alert, prompt} from 'react-native';
 var pos = NativeModules.NativePosModule;
 var posprint = NativeModules.NativePosPrintModule;
-import { Colors } from 'react-native/Libraries/NewAppScreen';
 const NativePosEmitter = new NativeEventEmitter(pos);
 
 /**

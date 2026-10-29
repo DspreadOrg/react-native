@@ -63,6 +63,7 @@ import java.util.Map;
 public class NativePosModule extends ReactContextBaseJavaModule {
     public static final String NAME = "NativePosModule";
     private static final String TAG = "NativePosModule";
+    private static volatile NativePosModule sInstance;
     public ReactApplicationContext reactApplicationContext;
     public Context context;
     private QPOSService pos;
@@ -87,10 +88,15 @@ public class NativePosModule extends ReactContextBaseJavaModule {
 
     public NativePosModule(ReactApplicationContext applicationContext) {
         super(applicationContext);
+        sInstance = this;
         this.reactApplicationContext = applicationContext;
         context = applicationContext;
         applicationContext.addActivityEventListener(activityEventListener);
         Log.w(TAG, "NativePosModule constructed, activityEventListener registered");
+    }
+
+    public static NativePosModule getInstance() {
+        return sInstance;
     }
 
     public void onBluetoothPermissionResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -352,9 +358,15 @@ public class NativePosModule extends ReactContextBaseJavaModule {
 
     }
 
-    @ReactMethod
-    public Hashtable getICCTag(int encryType, int cardType, int tagCount, String tagArrStr) {
-        return pos.getICCTag(QPOSService.EncryptType.values()[encryType], cardType, tagCount, tagArrStr);
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public WritableMap getICCTag(int encryType, int cardType, int tagCount, String tagArrStr) {
+        Hashtable table = pos.getICCTag(QPOSService.EncryptType.values()[encryType], cardType, tagCount, tagArrStr);
+        WritableMap map = Arguments.createMap();
+        for (Object key : table.keySet()) {
+            Object value = table.get(key);
+            map.putString(String.valueOf(key), value == null ? "" : String.valueOf(value));
+        }
+        return map;
     }
 
     @ReactMethod
@@ -367,9 +379,14 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         pos.doEmvApp(QPOSService.EmvOption.values()[emvOption]);
     }
 
-    @ReactMethod
-    public Hashtable<String, String> getNFCBatchData() {
-        return pos.getNFCBatchData();
+    @ReactMethod(isBlockingSynchronousMethod = true)
+    public WritableMap getNFCBatchData() {
+        Hashtable<String, String> data = pos.getNFCBatchData();
+        WritableMap map = Arguments.createMap();
+        for (Map.Entry<String, String> entry : data.entrySet()) {
+            map.putString(entry.getKey(), entry.getValue() == null ? "" : entry.getValue());
+        }
+        return map;
     }
 
     @ReactMethod
@@ -1419,8 +1436,8 @@ public class NativePosModule extends ReactContextBaseJavaModule {
         sendEvent(getReactApplicationContext(), "NativePosReminder", params);
     }
 
-    @ReactMethod
-    public void sendEvent(ReactContext reactContext,
+    // 仅供模块内部发送事件使用,不暴露给 JS(新架构 interop 不支持 ReactContext 参数)
+    private void sendEvent(ReactContext reactContext,
                           String eventName,
                           @Nullable WritableMap params) {
         reactContext

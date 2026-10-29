@@ -2,11 +2,12 @@ apply plugin: 'com.android.library'
 //apply plugin: 'com.novoda.bintray-release'// 新增`
 
 android {
-    compileSdkVersion 32
+    namespace 'com.binioter.guideview'
+    compileSdkVersion 36
 
     defaultConfig {
         minSdkVersion 17
-        targetSdkVersion 32
+        targetSdkVersion 36
     }
     buildTypes {
         release {
