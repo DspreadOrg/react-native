@@ -290,7 +290,7 @@
     <string name="updateInjectKeys">update Keys:</string>
     <string name="title_activity_welcome">WelcomeActivity</string>
     <string name="hello_world">Hello world!</string>
-    <string name="pedi_command">&#091;AOPEDI&#059;VS2&#059;RF0&#059;TD1&#059;CC%s&#059;RG%s&#059;CE%s&#059;&#093;</string>
+    <string name="pedi_command" formatted="false">&#091;AOPEDI&#059;VS2&#059;RF0&#059;TD1&#059;CC%s&#059;RG%s&#059;CE%s&#059;&#093;</string>
     <string name="pedk_command">&#091;AOPEDK&#059;KN&#059;RD&#059;CE%s&#059;&#093;</string>
     <string name="pedv_command">&#091;AOPEDV&#059;KV&#059;RD&#059;CE%s&#059;&#093;</string>
 
